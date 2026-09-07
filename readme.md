@@ -184,7 +184,7 @@ TacticalEdge-ANC/
 │
 ├── data/                         # Tactical dataset directory
 │   ├── clean/                    # 16 kHz mono clean speech utterances
-│   ├── noise/                    # Combat sound profiles (Tanks, Helicopters, Ballistics)
+│   ├── noisy/                    # Combat sound profiles (Tanks, Helicopters, Ballistics)
 │   └── train_set/
 │       └── manifest.csv          # Managed file paths & SNR configurations
 │
@@ -219,7 +219,7 @@ TacticalEdge-ANC/
 
 1. **Clone the Repository:**
 ```bash
-git clone [https://github.com/your-username/TacticalEdge-ANC.git](https://github.com/your-username/TacticalEdge-ANC.git)
+git clone https://github.com/your-username/TacticalEdge-ANC.git
 cd TacticalEdge-ANC
 
 ```
@@ -369,9 +369,3 @@ Developed for the **Smart India Hackathon (SIH26052)** under the problem categor
   year        = {2026},
   type        = {Technical Benchmark Report}
 }
-
-```
-
-```
-
-```
