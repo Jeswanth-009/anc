@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Generated training and evaluation artifacts
+data/train_set/clean/
+data/train_set/noisy/
+results/
+test_out/
+
+# Local Streamlit and OS files
+.streamlit/secrets.toml
+.DS_Store
+Thumbs.db

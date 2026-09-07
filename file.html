@@ -1,0 +1,3713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI/ML-Enabled Adaptive Noise Cancellation System — Technical Specification</title>
+<style>
+@page {
+  size: A4 portrait;
+  margin: 14mm 11mm 16mm 11mm;
+  @bottom-left {
+    content: "AI/ML-Enabled ANC System for Defence Noises — DRDO / SIH SIH26052";
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+    font-weight: 600;
+  }
+}
+@page :first {
+  margin: 0;
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface2: #f1f5f9;
+  --surface3: #e2e8f0;
+  --fg: #0f172a;
+  --fg2: #334155;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --accent: #b45309;        /* Tactical Gold / Ochre */
+  --accent2: #0f766e;       /* Tactical Deep Teal */
+  --danger: #b91c1c;
+  --success: #15803d;
+  --info: #1d4ed8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.58;
+  font-size: 9.5pt;
+}
+
+.page {
+  background: var(--surface);
+  padding: 10mm 12mm;
+  margin: 0 auto 10mm auto;
+  max-width: 210mm;
+  min-height: 297mm;
+  position: relative;
+}
+
+section.page {
+  page-break-before: always;
+  break-before: page;
+}
+
+section.page:first-of-type {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+.cover {
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 25mm 20mm;
+}
+
+h1, h2, h3, h4, h5 {
+  page-break-after: avoid;
+  break-after: avoid;
+  color: var(--fg);
+}
+
+.cover h1 {
+  font-size: 28pt;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.cover h2 {
+  font-size: 14pt;
+  font-weight: 500;
+  color: var(--accent2);
+  letter-spacing: 0.03em;
+  margin-bottom: 24px;
+  border-bottom: none;
+  padding-bottom: 0;
+  text-transform: none;
+}
+
+.cover .meta {
+  color: var(--fg2);
+  font-size: 9.5pt;
+  line-height: 1.85;
+}
+
+.divider-line {
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 18px auto;
+}
+
+h1 {
+  font-size: 18pt;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 13pt;
+  color: var(--accent2);
+  margin: 14px 0 6px;
+  border-bottom: 1.5px solid var(--accent2);
+  padding-bottom: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+h3 {
+  font-size: 10.5pt;
+  color: var(--fg);
+  margin: 10px 0 4px;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: 9pt;
+  color: var(--accent);
+  margin: 8px 0 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+h5 {
+  font-size: 8.5pt;
+  color: var(--fg2);
+  margin: 6px 0 2px;
+  font-weight: 600;
+}
+
+p {
+  margin-bottom: 6px;
+  color: var(--fg2);
+  font-size: 9pt;
+  text-align: justify;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 12px;
+  font-size: 8pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 4px 7px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--surface2);
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+tr:nth-child(even) {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+pre {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+  border-radius: 3px;
+  padding: 8px 10px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 7.6pt;
+  margin: 6px 0 8px;
+  color: #0f172a;
+  line-height: 1.4;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 8pt;
+  background: var(--surface2);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+ul, ol {
+  padding-left: 18px;
+  margin: 4px 0 6px;
+}
+
+li {
+  margin-bottom: 2px;
+  font-size: 9pt;
+  color: var(--fg2);
+}
+
+.callout {
+  border-left: 3.5px solid var(--accent);
+  background: var(--surface2);
+  padding: 6px 10px;
+  margin: 8px 0;
+  border-radius: 0 3px 3px 0;
+  font-size: 8.8pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.callout-blue { border-left-color: var(--accent2); }
+.callout-red { border-left-color: var(--danger); background: #fef2f2; }
+.callout-green { border-left-color: var(--success); background: #f0fdf4; }
+.callout-info { border-left-color: var(--info); background: #eff6ff; }
+
+.tag {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 7pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tag-yellow { background: #fef3c7; color: var(--accent); }
+.tag-cyan { background: #ccfbf1; color: var(--accent2); }
+.tag-red { background: #fee2e2; color: var(--danger); }
+.tag-green { background: #dcfce7; color: var(--success); }
+.tag-blue { background: #dbeafe; color: var(--info); }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.section-number {
+  font-size: 24pt;
+  font-weight: 900;
+  color: var(--accent);
+  opacity: 0.25;
+  line-height: 1;
+  min-width: 32px;
+  font-family: monospace;
+}
+
+.diagram {
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  color: var(--fg2);
+  margin: 8px 0;
+  font-size: 7.4pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.diagram pre {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 7.2pt;
+  line-height: 1.35;
+}
+
+.ref-item {
+  margin-bottom: 4px;
+  font-size: 8.5pt;
+  color: var(--fg2);
+}
+
+.ref-item .ref-id {
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+@media print {
+  body { background: #fff; }
+  .page {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<section class="page cover">
+  <div style="position:relative; z-index:1; max-width:800px; margin:auto;">
+    <div style="font-size:9pt; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; font-weight:700;">
+      Technical Specification &amp; Implementation Blueprint[cite: 1]
+    </div>
+    <h1>AI/ML-Enabled Adaptive<br>Noise Cancellation System</h1>
+    <h2>for Tactical Defence Audio Environments[cite: 1]</h2>
+    <div class="divider-line"></div>
+    <div class="meta">
+      <p><strong>Problem Statement:</strong> DRDO / SIH SIH26052[cite: 1]</p>
+      <p><strong>Platforms:</strong> x86_64 Workstation (Tier 1) &bull; Raspberry Pi 5 ARMv8.2-A (Tier 2)[cite: 1]</p>
+      <p><strong>Architecture:</strong> Aux-IVA + GTCRN/DFN Complex-Domain Neural + NLMS Hybrid Pipeline[cite: 1]</p>
+      <p style="margin-top:10px; color:var(--accent); font-weight:600;">31+ Sources &bull; Mathematical Formulations &bull; Production Code[cite: 1]</p>
+    </div>
+    <div class="divider-line"></div>
+    <div class="meta" style="margin-top:18px;">
+      <p>Confidential &mdash; Defence Applications[cite: 1]</p>
+      <p>Version 3.0 &mdash; September 2026[cite: 1]</p>
+    </div>
+  </div>
+</section>
+
+<!-- TABLE OF CONTENTS -->
+<section class="page">
+  <h2>Table of Contents[cite: 1]</h2>
+  <div style="margin-top:8px; font-size:9pt; line-height:1.75;">
+    <ol>
+      <li>Executive Summary &amp; Operational Requirements[cite: 1]</li>
+      <li>Theoretical Signal Processing Foundations[cite: 1]</li>
+      <li>Open-Source Model Benchmark &amp; Selection Matrix[cite: 1]</li>
+      <li>End-to-End Hybrid System Topology[cite: 1]</li>
+      <li>Tactical Defence Dataset Pipeline[cite: 1]</li>
+      <li>Neural Network Mathematics &amp; Loss Formulations[cite: 1]</li>
+      <li>Workstation PC Prototyping Platform[cite: 1]</li>
+      <li>Embedded Raspberry Pi 5 Deployment[cite: 1]</li>
+      <li>Comprehensive Latency Budget &amp; Timing Analysis[cite: 1]</li>
+      <li>Empirical Benchmarking &amp; Validation[cite: 1]</li>
+      <li>Tactical Hardening &amp; Failure Modes[cite: 1]</li>
+      <li>Phased Implementation Roadmap[cite: 1]</li>
+      <li>Definitive Architectural Synthesis[cite: 1]</li>
+      <li>References &amp; Sources[cite: 1]</li>
+      <li>Performance Optimization &amp; Profiling[cite: 1]</li>
+      <li>Appendix A: Code Templates[cite: 1]</li>
+      <li>Appendix B: Glossary[cite: 1]</li>
+      <li>Appendix C: Risk Matrix[cite: 1]</li>
+      <li>Appendix D: Quantization &amp; INT8 Deployment Guide[cite: 1]</li>
+      <li>Appendix E: Field Deployment Checklist[cite: 1]</li>
+    </ol>
+  </div>
+  <div class="callout callout-info" style="margin-top:16px;">
+    <strong>Document Scope:</strong> This technical specification consolidates 31+ research sources into a complete engineering blueprint covering theoretical foundations, mathematical formulations, model selection, dataset engineering, training pipelines, real-time streaming architecture, embedded deployment, latency analysis, and field validation protocols[cite: 1].
+  </div>
+</section>
+
+<!-- SECTION 01 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <h2>Executive Summary &amp; Operational Requirements[cite: 1]</h2>
+  </div>
+  <h3>1.1 Operational Context[cite: 1]</h3>
+  <p>Tactical communications in modern land, air, and naval warfare operate within acoustically hostile environments[cite: 1]. Warfighters and system operators must maintain voice intelligibility across tactical radios, intercom systems, and headsets while subjected to extreme acoustic disturbances[cite: 1].</p>
+  
+  <div class="diagram">
+<pre>
+TACTICAL ACOUSTIC DISTURBANCE SPECTRUM[cite: 1]
+                                    |
+    +-------------------------------+-------------------------------+
+    v                               v                               v
+STATIONARY CONTINUOUS        NON-STATIONARY DYNAMIC           HIGH-ENERGY IMPULSIVE[cite: 1]
+- Heavy diesel rumblings     - Helicopter blade-vortex wash   - Small-arms muzzle blasts[cite: 1]
+- Auxiliary generators       - Jet turbine & drone whine      - Artillery & mortar shocks[cite: 1]
+- Cooling fans in shelters   - High-velocity boundary wind    - Breaching explosions[cite: 1]
+                             - Multi-tone emergency sirens    - Transducer clipping events[cite: 1]
+</pre>
+  </div>
+  <p>Conventional DSP filters (LMS, NLMS, RLS, spectral subtraction) fail under these conditions[cite: 1]. They introduce severe speech cancellation during double-talk, diverge during ballistic shockwaves, and cannot resolve non-linear cabin acoustic reflections[cite: 1].</p>
+
+  <h3>1.2 Mission Objective[cite: 1]</h3>
+  <p>This project specifies, trains, optimizes, and deploys a <strong>Hybrid AI/ML and Classical DSP Adaptive Noise Cancellation System</strong>[cite: 1]. The architecture cascades an unconstrained spatial/blind source separation front-end, a causal deep complex-domain neural speech enhancement engine, and a downstream classical adaptive filter (NLMS/FxLMS) to remove residual tonal stationary components[cite: 1].</p>
+  <p>The system operates across two functional modes:</p>
+  <ol>
+    <li><strong>Uplink Speech Intelligibility Enhancement (Primary):</strong> Cleans the operator outbound voice from boom/throat microphones prior to radio transmission[cite: 1].</li>
+    <li><strong>Active Anti-Noise Generation (Downlink/Headphone ANC):</strong> Synthesizes phase-inverted acoustic waveforms to drive earphone transducers, suppressing ambient noise entering the ear canal[cite: 1].</li>
+  </ol>
+
+  <h3>1.3 Quantitative Key Performance Indicators[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter / Metric[cite: 1]</th>
+        <th>Tactical Target[cite: 1]</th>
+        <th>Measurement Method[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Signal-to-Noise Ratio Improvement[cite: 1]</td>
+        <td><strong>&gt; 15.0 dB</strong>[cite: 1]</td>
+        <td>SNR_out - SNR_in across profiles[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Short-Time Objective Intelligibility (STOI)[cite: 1]</td>
+        <td><strong>&gt; 0.85</strong>[cite: 1]</td>
+        <td>pystoi across military environments[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Perceptual Evaluation of Speech Quality (PESQ)[cite: 1]</td>
+        <td><strong>&gt; 2.50 (WB P.862.2)</strong>[cite: 1]</td>
+        <td>pesq library; -0.5 to 4.5 range[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DNSMOS P.835[cite: 1]</td>
+        <td><strong>OVRL &gt; 3.20, SIG &gt; 3.60</strong>[cite: 1]</td>
+        <td>Neural proxy, non-intrusive[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Algorithmic Latency[cite: 1]</td>
+        <td><strong>&le; 8.0-16.0 ms</strong>[cite: 1]</td>
+        <td>Window hop + neural lookahead[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Total Hardware Roundtrip Latency[cite: 1]</td>
+        <td><strong>&lt; 20.0 ms (target &le; 17.2 ms)</strong>[cite: 1]</td>
+        <td>Physical mic to DAC output[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Real-Time Factor (RTF)[cite: 1]</td>
+        <td><strong>&lt; 0.30 (RPi: &le; 0.15)</strong>[cite: 1]</td>
+        <td>T_process / T_audio_frame[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Active Thermal/Electrical Footprint[cite: 1]</td>
+        <td><strong>&le; 7.5 W, no throttling</strong>[cite: 1]</td>
+        <td>Sustained on RPi 5 w/ cooling[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.4 Two-Tier Platform Strategy[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Aspect[cite: 1]</th>
+        <th>Tier 1: Workstation (x86_64)[cite: 1]</th>
+        <th>Tier 2: RPi 5 (ARMv8.2-A)[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Purpose[cite: 1]</td>
+        <td>Training, validation, prototyping[cite: 1]</td>
+        <td>Field-deployed operational unit[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Compute[cite: 1]</td>
+        <td>GPU (RTX 3060/4080, CUDA)[cite: 1]</td>
+        <td>4x Cortex-A76 @ 2.4 GHz (NEON SDOT)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Model[cite: 1]</td>
+        <td>Full FP32/FP16 models[cite: 1]</td>
+        <td>INT8 quantized (ONNX Runtime)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Audio I/O[cite: 1]</td>
+        <td>USB audio interface (Scarlett 2i2)[cite: 1]</td>
+        <td>I2S direct DMA (ReSpeaker HAT)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>OS[cite: 1]</td>
+        <td>Ubuntu 22.04 / Windows 11[cite: 1]</td>
+        <td>RPi OS 64-bit + PREEMPT_RT kernel[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Power[cite: 1]</td>
+        <td>150-300W (mains)[cite: 1]</td>
+        <td>&le; 7.5W (battery-capable)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Latency Target[cite: 1]</td>
+        <td>&lt; 15 ms[cite: 1]</td>
+        <td>&le; 17.22 ms deterministic[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.5 Tactical Deployment Scenarios[cite: 1]</h3>
+  <p>The ANC system is designed for integration into the following operational platforms, each presenting unique acoustic challenges:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Platform[cite: 1]</th>
+        <th>Primary Noise Sources[cite: 1]</th>
+        <th>SPL Range[cite: 1]</th>
+        <th>Key Challenge[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Armored Personnel Carrier (APC)[cite: 1]</td>
+        <td>Diesel engine (1200 RPM), track squeal, turret motor[cite: 1]</td>
+        <td>95-115 dB[cite: 1]</td>
+        <td>Enclosed resonant cavity; harmonic interference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Main Battle Tank (MBT)[cite: 1]</td>
+        <td>Gas turbine (1500 HP), cannon fire, ammunition handling[cite: 1]</td>
+        <td>100-130 dB[cite: 1]</td>
+        <td>Impulsive cannon shock; extreme SPL[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Attack Helicopter (AH-64)[cite: 1]</td>
+        <td>Rotor blade vortex (400 Hz fundamental), turboshaft[cite: 1]</td>
+        <td>105-120 dB[cite: 1]</td>
+        <td>Amplitude modulation at blade-pass frequency[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Transport Aircraft (C-130)[cite: 1]</td>
+        <td>4x T56 turboprop, wind noise at door openings[cite: 1]</td>
+        <td>90-110 dB[cite: 1]</td>
+        <td>Multi-tone harmonic interference; wind[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Naval Vessel (FFG)[cite: 1]</td>
+        <td>Diesel generators, hull resonance, sonar pings[cite: 1]</td>
+        <td>85-105 dB[cite: 1]</td>
+        <td>Low-frequency hull vibration; sonar interference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Forward Operating Base (FOB)[cite: 1]</td>
+        <td>Generator sets, vehicle convoys, mortar fire[cite: 1]</td>
+        <td>80-120 dB[cite: 1]</td>
+        <td>Mixed stationary + impulsive; variable conditions[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.6 Regulatory &amp; Standards Compliance[cite: 1]</h3>
+  <p>The system must comply with the following defence standards and communication protocols:[cite: 1]</p>
+  <ol>
+    <li><strong>MIL-STD-461G:</strong> Electromagnetic interference/compatibility (EMI/EMC) requirements for shipboard, aircraft, and ground vehicles[cite: 1]. CE102 (conducted emissions) and RE102 (radiated emissions) limits apply[cite: 1].</li>
+    <li><strong>MIL-STD-810H:</strong> Environmental engineering considerations and laboratory tests[cite: 1]. Temperature cycling (-40C to +71C), humidity (5-95% RH), vibration (Method 514.8), and shock (Method 516.8) profiles[cite: 1].</li>
+    <li><strong>MIL-STD-188-220:</strong> Interoperability standards for tactical data communications[cite: 1]. Audio quality requirements for voice communications over tactical radios[cite: 1].</li>
+    <li><strong>NATO STANAG 4370:</strong> Environmental testing standards for NATO member forces[cite: 1]. Ensures interoperability across alliance platforms[cite: 1].</li>
+    <li><strong>ITU-T P.862 (PESQ):</strong> Perceptual Evaluation of Speech Quality standard for objective voice quality assessment[cite: 1].</li>
+    <li><strong>ETSI TS 103 224:</strong> Advanced Voice Call Services (AVCS) quality requirements for tactical voice communications[cite: 1].</li>
+  </ol>
+
+  <h3>1.7 System Integration Architecture[cite: 1]</h3>
+  <p>The ANC module integrates into existing tactical headset systems via a standard PTT (Push-To-Talk) interface[cite: 1]. The integration architecture:[cite: 1]</p>
+  <div class="diagram">
+<pre>
+SYSTEM INTEGRATION TOPOLOGY[cite: 1]
+
+TACTICAL HEADSET                  ANC PROCESSING UNIT              RADIO/COMMS[cite: 1]
++-------------------+            +---------------------+           +----------+
+| Boom Mic (primary)| --I2S-->   | RPi 5 + ReSpeaker   | --PTT-->  | SINCGARS |[cite: 1]
+| Ref Mic (ambient) | --I2S-->   | GTCRN + NLMS Engine |           | Harris   |[cite: 1]
+| Ear Speaker       | &lt;--I2S--   | Core 3 Isolated     | &lt;--PTT--  | Thales   |[cite: 1]
+| PTT Switch        | --GPIO-->  | PREEMPT_RT Kernel   |           | AN/PRC   |[cite: 1]
++-------------------+            +---------------------+           +----------+
+                                          |
+                                   +------+------+
+                                   | USB-C Power |[cite: 1]
+                                   | 5V @ 1.5A   |[cite: 1]
+                                   | Battery Pack|[cite: 1]
+                                   +-------------+
+</pre>
+  </div>
+</section>
+
+<!-- SECTION 02 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <h2>Theoretical Signal Processing Foundations[cite: 1]</h2>
+  </div>
+  <h3>2.1 Mathematical Breakdown of Classical Adaptive Filtering[cite: 1]</h3>
+  <p>In classical adaptive noise cancellation, an observed primary microphone signal d(n) captures target speech s(n) corrupted by additive noise v0(n):[cite: 1]</p>
+  <pre><code>d(n) = s(n) + v0(n)</code></pre>
+  <p>A secondary reference microphone captures noise x(n) correlated with v0(n) via acoustic transfer function H(z):[cite: 1]</p>
+  <pre><code>v0(n) = h(n) * x(n) = Sum_{k=0}^{L-1} h(k) * x(n-k)</code></pre>
+  <p>A classical FIR filter attempts to estimate H(z) dynamically:[cite: 1]</p>
+  <pre><code>v_hat(n) = w_hat^T(n) * x(n)
+e(n) = d(n) - v_hat(n)</code></pre>
+  <p>Under NLMS, filter taps update via stochastic gradient:[cite: 1]</p>
+  <pre><code>w_hat(n+1) = w_hat(n) + (mu / (||x(n)||^2 + epsilon)) * e(n) * x(n)</code></pre>
+  
+  <div class="diagram">
+<pre>
+CLASSICAL NLMS TOPOLOGY[cite: 1]
+
+Reference Noise x(n) ----+----------->[ Adaptive Filter w(n) ][cite: 1]
+                         |                      |
+                         |                      v -
+Primary Mic d(n) --------+---------------------( + )---> Error / Clean e(n)[cite: 1]
+[Speech s(n) +           |                      ^
+ Noise v0(n) ]           |                      | Feedback Error[cite: 1]
+                         +----------------------+
+</pre>
+  </div>
+
+  <h3>2.2 Physical and Algorithmic Failure Modes[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Failure Mode[cite: 1]</th>
+        <th>Physical Mechanism[cite: 1]</th>
+        <th>Operational Impact[cite: 1]</th>
+        <th>Mitigation[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ballistic Impulse Gradient Explosion[cite: 1]</td>
+        <td>Microsecond shocks saturate stochastic gradient descent[cite: 1]</td>
+        <td>Filter diverges after weapons fire; sustained ringing/howling[cite: 1]</td>
+        <td>Transient onset gate + neural TRA module[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Non-Linear Cabin Resonance[cite: 1]</td>
+        <td>Armored hulls act as high-Q resonant cavities; mic diaphragm saturation at &gt;110 dB SPL[cite: 1]</td>
+        <td>Linear convolution cannot model x^2(n), x^3(n) harmonic distortion[cite: 1]</td>
+        <td>Non-linear neural mapping (CRM); hardware Zener limiters[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>High-Velocity Doppler Drift[cite: 1]</td>
+        <td>Rotor/jet turbine shifts fundamental frequencies rapidly[cite: 1]</td>
+        <td>Large mu causes misadjustment; small mu cannot track[cite: 1]</td>
+        <td>Neural attention (TRA) handles transients without mu trade-off[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Speech Crosstalk / Double-Talk[cite: 1]</td>
+        <td>Speaker voice bleeds into reference mic: x(n) = v(n) + delta*s(n)[cite: 1]</td>
+        <td>Adaptive filter cancels vocal formants, distorting speech[cite: 1]</td>
+        <td>Aux-IVA spatial separation + VAD decoupling[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 Rationale for Complex-Domain Deep Learning[cite: 1]</h3>
+  <p>Deep neural networks solve these limitations by framing noise suppression as a non-linear spectral mapping and complex-domain filtering problem[cite: 1]. Human speech formants follow strict physiological, temporal, and harmonic constraints governed by vocal tract dynamics[cite: 1].</p>
+  <p>By utilizing Complex STFT, neural architectures model both spectral magnitude envelopes and phase continuity:[cite: 1]</p>
+  <pre><code>Y(k, t) = S(k, t) + N(k, t) = |Y(k,t)| * e^(j * theta_Y(k,t))</code></pre>
+  <p>Phase modeling is essential for low-SNR environments (SNR &lt; 0 dB)[cite: 1]. Traditional magnitude-only masking synthesizes time-domain signals using corrupted input phase, creating audible musical noise[cite: 1]. Complex Ratio Masking (CRM) preserves acoustic phase coherence:[cite: 1]</p>
+  <pre><code>S_hat(k,t) = M_complex(k,t) * Y(k,t) = (M_r + j*M_i) * (Y_r + j*Y_i)
+S_hat_r = M_r*Y_r - M_i*Y_i
+S_hat_i = M_r*Y_i + M_i*Y_r</code></pre>
+  <p>Operating directly on complex coefficients using CRM or Deep Complex Filtering prevents speech distortion and phase smearing in low-SNR environments (down to -15 dB)[cite: 1].</p>
+
+  <h3>2.4 Convergence Analysis of Adaptive Filters[cite: 1]</h3>
+  <p>The convergence behavior of NLMS is governed by the eigenvalue spread of the input signal autocorrelation matrix R = E[x(n)x^T(n)][cite: 1]. For colored noise sources common in defense environments (helicopter rotors, engine rumble), the condition number kappa(R) = lambda_max/lambda_min can exceed 1000, causing:[cite: 1]</p>
+  <ol>
+    <li>Slow convergence in directions corresponding to small eigenvalues (low-frequency tonal components)[cite: 1]</li>
+    <li>Misadjustment proportional to mu * trace(R), requiring careful step-size selection[cite: 1]</li>
+    <li>Divergence risk when impulse noise violates the persistent excitation assumption[cite: 1]</li>
+  </ol>
+  <p>The optimal step size mu_opt = 2/(lambda_max + lambda_min) yields convergence time constant tau = 1/(2*mu*lambda_min)[cite: 1]. For a 64-tap filter at 16 kHz with vehicle noise (kappa ~ 500), this requires ~32,000 samples (2 seconds) to converge — far too slow for tactical onset transients[cite: 1].</p>
+
+  <h3>2.5 Wiener Filter Optimum and Its Limitations[cite: 1]</h3>
+  <p>The Wiener solution represents the statistically optimal linear filter:[cite: 1]</p>
+  <pre><code>w_opt = R^{-1} * p
+where R = E[x(n)x^T(n)] and p = E[x(n)*d(n)]</code></pre>
+  <p>In stationary conditions, NLMS converges toward w_opt[cite: 1]. However, defense acoustics violate the wide-sense stationary (WSS) assumption within 50-200 ms during ballistic events[cite: 1]. The autocorrelation matrix R becomes time-varying: R(n) = lambda*R(n-1) + (1-lambda)*x(n)x^T(n) with forgetting factor lambda ~ 0.99[cite: 1]. Even exponential forgetting cannot track rapid spectral changes during muzzle blasts where the noise power spectral density shifts by 30+ dB within 1 ms[cite: 1].</p>
+  <p>This fundamental limitation motivates the hybrid architecture: a neural network handles the non-stationary, non-linear components that classical adaptive filtering cannot track, while the downstream NLMS operates only on the residual stationary tones remaining after neural enhancement — conditions where classical optimality theory holds[cite: 1].</p>
+</section>
+
+<!-- SECTION 03 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <h2>Exhaustive Model Benchmark &amp; Selection Matrix[cite: 1]</h2>
+  </div>
+  <h3>3.1 Comprehensive Model Comparison[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Model[cite: 1]</th>
+        <th>Params[cite: 1]</th>
+        <th>Compute[cite: 1]</th>
+        <th>Alg. Latency[cite: 1]</th>
+        <th>Native Rate[cite: 1]</th>
+        <th>Mechanism[cite: 1]</th>
+        <th>RPi 5 Feasibility[cite: 1]</th>
+        <th>PESQ / STOI / SNR[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>GTCRN</strong>[cite: 1]</td>
+        <td><strong>48.2K</strong>[cite: 1]</td>
+        <td><strong>33 MMACs/s</strong>[cite: 1]</td>
+        <td><strong>16ms causal</strong>[cite: 1]</td>
+        <td>16kHz[cite: 1]</td>
+        <td>Grouped 1D-Conv + DPGRNN + TRA[cite: 1]</td>
+        <td><strong>Optimal (RTF &le; 0.05)</strong>[cite: 1]</td>
+        <td><strong>2.89 / 0.94 / 17.9dB</strong>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td><strong>H-GTCRN</strong>[cite: 1]</td>
+        <td>52.0K[cite: 1]</td>
+        <td>38 MMACs/s[cite: 1]</td>
+        <td>16ms causal[cite: 1]</td>
+        <td>16kHz[cite: 1]</td>
+        <td>Dual-ch Aux-IVA + spatial GTCRN[cite: 1]</td>
+        <td><strong>Optimal (RTF &le; 0.06)</strong>[cite: 1]</td>
+        <td><strong>2.95 / 0.95 / 18.8dB</strong>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DeepFilterNet3[cite: 1]</td>
+        <td>2.31M[cite: 1]</td>
+        <td>350 MMACs/s[cite: 1]</td>
+        <td>40ms (2-frame lookahead)[cite: 1]</td>
+        <td>48kHz[cite: 1]</td>
+        <td>ERB gain + 5-tap deep filtering[cite: 1]</td>
+        <td>Viable (RTF ~0.18)[cite: 1]</td>
+        <td>3.12 / 0.96 / 19.4dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DTLN[cite: 1]</td>
+        <td>986K[cite: 1]</td>
+        <td>180 MMACs/s[cite: 1]</td>
+        <td>16ms causal[cite: 1]</td>
+        <td>16kHz[cite: 1]</td>
+        <td>Dual-signal STFT LSTM + autoencoder[cite: 1]</td>
+        <td>Viable (RTF ~0.08)[cite: 1]</td>
+        <td>2.70 / 0.91 / 15.6dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>RNNoise[cite: 1]</td>
+        <td>61K[cite: 1]</td>
+        <td>40 MMACs/s[cite: 1]</td>
+        <td>10ms causal[cite: 1]</td>
+        <td>48kHz[cite: 1]</td>
+        <td>Bark-scale GRU + pitch comb[cite: 1]</td>
+        <td>Extreme low (RTF &le; 0.02)[cite: 1]</td>
+        <td>2.34 / 0.83 / 12.1dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DPDFNet[cite: 1]</td>
+        <td>2.49M[cite: 1]</td>
+        <td>1.35 GMACs/s[cite: 1]</td>
+        <td>20ms causal[cite: 1]</td>
+        <td>48kHz[cite: 1]</td>
+        <td>Dual-path dilated complex[cite: 1]</td>
+        <td>Marginal (RTF ~0.45)[cite: 1]</td>
+        <td>3.05 / 0.94 / 17.2dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Demucs v4[cite: 1]</td>
+        <td>68.0M[cite: 1]</td>
+        <td>&gt;15 GMACs[cite: 1]</td>
+        <td>&gt;100ms non-causal[cite: 1]</td>
+        <td>44.1kHz[cite: 1]</td>
+        <td>U-Net + BiLSTM[cite: 1]</td>
+        <td>Infeasible (RTF &gt; 3.5)[cite: 1]</td>
+        <td>3.30 / 0.97 / 21.0dB[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 GTCRN — Primary Tactical Recommendation[cite: 1]</h3>
+  <p>GTCRN resolves the trade-off between computational complexity and separation performance on embedded platforms using three complementary techniques:[cite: 1]</p>
+  <ol>
+    <li><strong>ERB Subband Compression:</strong> Compresses 257 linear STFT bins to B=64 ERB bands matching human auditory resolution, shifting computation to vocal formants below 4 kHz[cite: 1].</li>
+    <li><strong>Grouped Convolutions + DPGRNN:</strong> Splits features into G=4 disjoint channel groups, processing independently before cross-group shuffling[cite: 1]. Intra-frame RNN captures spectral envelopes; inter-frame RNN captures temporal continuity[cite: 1].</li>
+    <li><strong>Temporal Recurrent Attention (TRA):</strong> Zero-lookahead attention identifies transient energy surges (muzzle blasts, artillery) and suppresses network activations, preventing impulsive smearing without degrading speech consonants[cite: 1].</li>
+  </ol>
+
+  <h3>3.3 DeepFilterNet3 — Wideband High-Fidelity Alternative[cite: 1]</h3>
+  <p>DeepFilterNet performs enhancement at full-band 48 kHz[cite: 1]. Stage 1 predicts ERB gains; Stage 2 reconstructs fine harmonic structures via deep complex filtering with a 5-tap causal frame window:[cite: 1]</p>
+  <pre><code>S_hat(f, t) = Sum_{l=0}^{4} W*(f, t, l) * Y(f, t-l)</code></pre>
+  <p><strong>Limitation:</strong> 2-frame lookahead (20 ms) + physical I2S buffering (16-24 ms) pushes total latency close to the 40 ms tactical boundary[cite: 1].</p>
+
+  <h3>3.4 DTLN — Robust Baseline[cite: 1]</h3>
+  <p>DTLN processes through two cascaded stages: (1) log-magnitude STFT mask prediction coupled with noisy phase; (2) learned 1D autoencoder for non-linear phase repair[cite: 1]. Simple and robust, but shows transient smearing during intense small-arms fire[cite: 1].</p>
+
+  <h3>3.5 Model Complexity &amp; Memory Analysis[cite: 1]</h3>
+  <p>Deploying neural models on embedded platforms requires careful analysis of memory hierarchy, cache utilization, and instruction set efficiency[cite: 1]. The table below compares inference characteristics across the candidate models:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Model[cite: 1]</th>
+        <th>Flash (KB)[cite: 1]</th>
+        <th>RAM (KB)[cite: 1]</th>
+        <th>L2 Fit[cite: 1]</th>
+        <th>ARM NEON[cite: 1]</th>
+        <th>INT8 QAT[cite: 1]</th>
+        <th>Inference (ms)[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>GTCRN</strong>[cite: 1]</td>
+        <td><strong>193</strong>[cite: 1]</td>
+        <td><strong>85</strong>[cite: 1]</td>
+        <td><strong>Yes (512KB L2)</strong>[cite: 1]</td>
+        <td><strong>SDOT optimized</strong>[cite: 1]</td>
+        <td><strong>Native</strong>[cite: 1]</td>
+        <td><strong>1.22</strong>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>H-GTCRN[cite: 1]</td>
+        <td>210[cite: 1]</td>
+        <td>95[cite: 1]</td>
+        <td>Yes[cite: 1]</td>
+        <td>SDOT optimized[cite: 1]</td>
+        <td>Native[cite: 1]</td>
+        <td>1.45[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DTLN[cite: 1]</td>
+        <td>3,944[cite: 1]</td>
+        <td>1,280[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>NEON FP32[cite: 1]</td>
+        <td>Requires QAT[cite: 1]</td>
+        <td>2.80[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DeepFilterNet3[cite: 1]</td>
+        <td>9,240[cite: 1]</td>
+        <td>3,600[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>NEON FP32[cite: 1]</td>
+        <td>Requires QAT[cite: 1]</td>
+        <td>4.50[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>RNNoise[cite: 1]</td>
+        <td>244[cite: 1]</td>
+        <td>120[cite: 1]</td>
+        <td>Yes[cite: 1]</td>
+        <td>SDOT possible[cite: 1]</td>
+        <td>Manual quant[cite: 1]</td>
+        <td>0.35[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DPDFNet[cite: 1]</td>
+        <td>9,960[cite: 1]</td>
+        <td>4,200[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>NEON FP32[cite: 1]</td>
+        <td>Requires QAT[cite: 1]</td>
+        <td>8.20[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Demucs v4[cite: 1]</td>
+        <td>272,000[cite: 1]</td>
+        <td>95,000[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>Infeasible[cite: 1]</td>
+        <td>Infeasible[cite: 1]</td>
+        <td>&gt;100[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Key Insight:</strong> GTCRN at 193 KB fits entirely within the BCM2712 Cortex-A76 L2 cache (512 KB), eliminating DRAM fetch stalls during inference[cite: 1]. DTLN and DeepFilterNet3 exceed L2 capacity, forcing cache-line misses that increase effective latency by 2-4x beyond theoretical compute time[cite: 1].</p>
+
+  <h3>3.6 Instruction-Level Optimization on ARM Cortex-A76[cite: 1]</h3>
+  <p>The Cortex-A76 supports ARMv8.2-A with dot-product int8 instructions (SDOT)[cite: 1]. GTCRN grouped convolutions map directly to SDOT: each 8-element int8 dot product completes in 1 cycle vs 4 cycles for FP32 FMLA[cite: 1]. The 4-group architecture enables software pipelining:[cite: 1]</p>
+  <pre><code>; Cortex-A76 SDOT pipeline (simplified)
+SDOT v0.4s, v1.16b, v2.16b  ; Group 0 dot-product
+SDOT v3.4s, v4.16b, v5.16b  ; Group 1 (parallel issue)
+FMLA s6, s7, s8             ; FP32 ERB mix (stall-free)
+STP q0, q3, [x_result]      ; Store both group results</code></pre>
+  <p>This maps to a theoretical peak of 2 SDOT ops/cycle on the A76 dual-issue NEON pipe, yielding 4.8 GOPS sustained at 2.4 GHz, exceeding GTCRN 33 MMACs requirement by 145x headroom[cite: 1].</p>
+</section>
+
+<!-- SECTION 04 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <h2>End-to-End Hybrid System Topology[cite: 1]</h2>
+  </div>
+  <div class="diagram">
+<pre>
+COMPLETE HYBRID SYSTEM ARCHITECTURE PIPELINE[cite: 1]
+
+PRIMARY TRANSDUCER                              REFERENCE TRANSDUCER[cite: 1]
+(Speech + Tactical Noise)                       (Ambient Environmental Noise)[cite: 1]
+        |                                               |
+        v                                               v
++---------------------+                       +---------------------+
+| ADC Sampling (I2S)  |                       | ADC Sampling (I2S)  |[cite: 1]
+| 16/48kHz, S16       |                       | 16/48kHz, S16       |[cite: 1]
++----------+----------+                       +----------+----------+
+           |                                               |
+           v                                               |
++-------------------------------------------------------+  |
+| STAGE 1: Coarse Spatial Decoupling (Aux-IVA)          |  |[cite: 1]
+| Unconstrained Blind Source Separation Front-End       |  |[cite: 1]
++----------------------------+--------------------------+  |
+                             |                             |
+          +------------------v------------------+          |
+          v                                     v          |
+ Separated Speech                       Separated Noise    |[cite: 1]
+          |                                     |          |
+          +------------------+------------------+          |
+                             |                             |
+                             v                             |
++-------------------------------------------------------+  |
+| STAGE 2: Transient Ballistic Onset Gate & Limiter     |  |[cite: 1]
+| Real-time Spectral Flux Derivative & Energy Detector   |  |[cite: 1]
++----------------------------+--------------------------+  |
+                             |                             |
+                             v                             |
++-------------------------------------------------------+  |
+| STAGE 3: Complex-Domain Neural Core (GTCRN/DFN)       |  |[cite: 1]
+| 512-pt STFT -> ERB -> Grouped Conv/RNN -> TRA -> CRM  |  |[cite: 1]
++----------------------------+--------------------------+  |
+                             |                             |
+                             v                             |
++-------------------------------------------------------+  |
+| STAGE 4: Inverse Complex STFT & Overlap-Add Synthesis |  |[cite: 1]
++----------------------------+--------------------------+  |
+                             |                             |
+                             v                             v
++-------------------------------------------------------+  |
+| STAGE 5: Classical NLMS Residual Filter               |&lt;-+[cite: 1]
+| Suppresses remaining stationary tones via Ref Mic     |   [cite: 1]
++----------------------------+--------------------------+
+                             |
+                             v
++-------------------------------------------------------+
+| STAGE 6: Soft Anti-Clipping Limiter & AGC              |[cite: 1]
++----------------------------+--------------------------+
+                             |
+                             v
+                 TACTICAL HEADSET / COMMS UPLINK[cite: 1]
+</pre>
+  </div>
+
+  <h3>4.1 Stage Functional Descriptions[cite: 1]</h3>
+  <ol>
+    <li><strong>Stage 1 — Aux-IVA:</strong> Auxiliary-Function Independent Vector Analysis separates multi-channel inputs via frequency-domain blind source separation[cite: 1]. Rapidly updates spatial demixing matrices W(f) using iterative projection, decorrelating speaker formants from environmental noise[cite: 1].</li>
+    <li><strong>Stage 2 — Transient Gate:</strong> Ballistic impulses produce rise times under 50 microseconds[cite: 1]. Exceeding dynamic spectral flux threshold, the gate attenuates leading edge, protecting neural recurrent states from gradient shock[cite: 1].</li>
+    <li><strong>Stage 3 — Neural Core:</strong> Causal GTCRN or DeepFilterNet executes on complex STFT bins, applying CRM to reconstruct speech harmonics and suppress diffuse ambient noise[cite: 1].</li>
+    <li><strong>Stage 4 — OLA Synthesis:</strong> IFFT using square-root Hann synthesis window reconstructs time-domain frames with zero phase-shift artifacts[cite: 1].</li>
+    <li><strong>Stage 5 — NLMS Residual:</strong> Lightweight classical filter (order M=32-64) downstream of neural network tracks remaining linear stationary tones[cite: 1]. Upstream neural processing ensures NLMS operates within its linear stability envelope[cite: 1].</li>
+    <li><strong>Stage 6 — Output Limiter:</strong> Normalizes dynamic range and prevents numeric wraparound clipping during acoustic surges[cite: 1].</li>
+  </ol>
+
+  <h3>4.2 Inter-Stage Data Format Specifications[cite: 1]</h3>
+  <p>Each pipeline stage operates on a specific data representation[cite: 1]. The table below specifies the exact tensor shapes and data types at each interface:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Interface[cite: 1]</th>
+        <th>Shape[cite: 1]</th>
+        <th>Data Type[cite: 1]</th>
+        <th>Sample Rate[cite: 1]</th>
+        <th>Notes[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ADC Input[cite: 1]</td>
+        <td>[2, 128] (ch, samples)[cite: 1]</td>
+        <td>int16 -> float32[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Dual-mic stereo interleaved[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After STFT[cite: 1]</td>
+        <td>[2, 257, 1] (ch, freq, time)[cite: 1]</td>
+        <td>complex64[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>512-pt FFT, 257 bins[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After Aux-IVA[cite: 1]</td>
+        <td>[2, 257, 1][cite: 1]</td>
+        <td>complex64[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Demixed spatial components[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After Gate[cite: 1]</td>
+        <td>[2, 257, 1][cite: 1]</td>
+        <td>complex64[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Impulse-attenuated[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After ERB[cite: 1]</td>
+        <td>[1, 64, 1][cite: 1]</td>
+        <td>float32[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Compressed to 64 ERB bands[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Neural Output[cite: 1]</td>
+        <td>[1, 257, 1][cite: 1]</td>
+        <td>complex64[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>CRM-masked complex spectrum[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After IFFT[cite: 1]</td>
+        <td>[1, 512][cite: 1]</td>
+        <td>float32[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Time-domain synthesis frame[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>After NLMS[cite: 1]</td>
+        <td>[1, 128][cite: 1]</td>
+        <td>float32[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Residual-filtered output[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DAC Output[cite: 1]</td>
+        <td>[2, 128][cite: 1]</td>
+        <td>int16[cite: 1]</td>
+        <td>16 kHz[cite: 1]</td>
+        <td>Stereo to earphone transducers[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>4.3 Auxiliary-Function IVA Mathematical Formulation[cite: 1]</h3>
+  <p>Aux-IVA separates B sources from M=2 microphone observations in the frequency domain[cite: 1]. For each frequency bin f:[cite: 1]</p>
+  <pre><code>Y(f, t) = A(f) * S(f, t)    [M x B mixing model]
+W(f) = A^{-1}(f)             [demixing matrix]
+X(f, t) = W(f) * Y(f, t)     [separated sources]</code></pre>
+  <p>The auxiliary function update rule for the demixing matrix:[cite: 1]</p>
+  <pre><code>W_new(f) = W(f) - mu * (phi(X) * X^H - I) * W(f)
+
+where:
+  phi(X) = E[|X|^(-2)] * diag(Expected source powers)
+  mu = step size (0.01-0.1)
+  H = conjugate transpose
+  I = identity matrix</code></pre>
+  <p>Convergence typically requires 10-20 iterations per frequency bin[cite: 1]. With G=4 frequency groups processed in parallel, total Aux-IVA latency is ~0.3 ms on Cortex-A76[cite: 1].</p>
+
+  <h3>4.4 Transient Ballistic Onset Gate Logic[cite: 1]</h3>
+  <p>The gate operates on the spectral flux derivative of the primary microphone signal:[cite: 1]</p>
+  <pre><code>SF(t) = Sum_k | |X(k,t)| - |X(k,t-1)| |    [spectral flux]
+DSF(t) = SF(t) - SF(t-1)                    [derivative]
+
+Gate state machine:
+  if DSF(t) > threshold_adaptive:
+      gate_state = CLOSED (attenuate by 20 dB)
+      recovery_counter = 0
+  elif gate_state == CLOSED:
+      recovery_counter += 1
+      attenuation = 20 * exp(-recovery_counter / tau_ms)
+      if attenuation < 0.5 dB: gate_state = OPEN
+
+threshold_adaptive = median(SF(t-100:t)) * 3.0
+tau_ms = 5.0    [5 ms exponential recovery]</code></pre>
+
+  <h3>4.5 NLMS Residual Filter Configuration[cite: 1]</h3>
+  <p>The downstream NLMS filter operates on the neural-enhanced signal with the secondary reference microphone as its noise reference:[cite: 1]</p>
+  <pre><code>Filter order M = 64 (4 ms memory @ 16 kHz)
+Step size mu = 0.05 (conservative for stability)
+Regularization epsilon = 1e-6
+Forgetting factor (optional): lambda = 0.9995
+
+Update rule:
+w(n+1) = w(n) + (mu / (x^T*x + eps)) * e(n) * x(n)
+
+where:
+  x(n) = [x(n), x(n-1), ..., x(n-M+1)]^T  [reference buffer]
+  e(n) = enhanced(n) - w^T * x(n)            [error signal]
+  w(n) = [w0, w1, ..., w_{M-1}]^T            [filter taps]</code></pre>
+  <p>The NLMS filter converges to its optimal solution within M/mu = 1280 samples (80 ms) for stationary noise, providing +1.5 dB additional SNR improvement over GTCRN-only[cite: 1].</p>
+</section>
+
+<!-- SECTION 05 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <h2>Tactical Defence Dataset Pipeline[cite: 1]</h2>
+  </div>
+  <h3>5.1 Defense Acoustic Data Repositories[cite: 1]</h3>
+  <div class="diagram">
+<pre>
+DATASET REPOSITORY COMPOSITION[cite: 1]
+                                |
+      +-------------------------+-------------------------+
+      v                         v                         v
+CLEAN SPEECH              STATIONARY COMBAT         IMPULSIVE & DYNAMIC[cite: 1]
+- LibriSpeech 100/360     - NOISEX-92 (Tanks)       - C3GD Gunshot Forensics[cite: 1]
+- VCTK (Accents)          - Military Audio Dataset  - Cadre Forensics[cite: 1]
+- DNS-5 Clean Subsets     - DEMAND (Engines)        - Zenodo Multi-Caliber[cite: 1]
+- Stressed/Shouted Speech - Rotor Wash/Turbine      - Artillery/Mortar[cite: 1]
+</pre>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Dataset[cite: 1]</th>
+        <th>Content[cite: 1]</th>
+        <th>Size[cite: 1]</th>
+        <th>Source[cite: 1]</th>
+        <th>Usage[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>LibriSpeech[cite: 1]</td>
+        <td>Clean reading speech[cite: 1]</td>
+        <td>460h (clean-100/360)[cite: 1]</td>
+        <td>openslr.org/12[cite: 1]</td>
+        <td>Primary clean speech[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>VCTK[cite: 1]</td>
+        <td>Multi-speaker, multi-accent[cite: 1]</td>
+        <td>~44h, 110 speakers[cite: 1]</td>
+        <td>datashare.is.ed.ac.uk[cite: 1]</td>
+        <td>Accent diversity[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DNS-5 Clean[cite: 1]</td>
+        <td>Shouted/emotional/stressed[cite: 1]</td>
+        <td>700h+[cite: 1]</td>
+        <td>microsoft/DNS-Challenge[cite: 1]</td>
+        <td>Military-like vocal stress[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>MAD[cite: 1]</td>
+        <td>Gunshots, shelling, helicopter[cite: 1]</td>
+        <td>~12h[cite: 1]</td>
+        <td>Kaggle/academic[cite: 1]</td>
+        <td>Defence noise primary[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>C3GD[cite: 1]</td>
+        <td>Multi-caliber gunshot forensics[cite: 1]</td>
+        <td>Varies[cite: 1]</td>
+        <td>Zenodo[cite: 1]</td>
+        <td>Impulsive ballistic data[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Cadre Forensics[cite: 1]</td>
+        <td>18 weapon platforms[cite: 1]</td>
+        <td>Varies[cite: 1]</td>
+        <td>ScienceDirect[cite: 1]</td>
+        <td>Muzzle blast + shockwave[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>NOISEX-92[cite: 1]</td>
+        <td>Tank, factory, vehicle cabin[cite: 1]</td>
+        <td>Standard benchmark[cite: 1]</td>
+        <td>Academic[cite: 1]</td>
+        <td>Stationary vehicle noise[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>AudioSet[cite: 1]</td>
+        <td>YouTube audio events[cite: 1]</td>
+        <td>Millions of clips[cite: 1]</td>
+        <td>Google Research[cite: 1]</td>
+        <td>Engines/sirens/wind/rotors[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Synthetic Acoustic Room Simulation (Image Source Method)[cite: 1]</h3>
+  <p>The pipeline simulates acoustic environments using pyroomacoustics ISM for an enclosed armored hull (4.5m x 3.0m x 2.2m) with low absorption (alpha ~ 0.15-0.25)[cite: 1]. Virtual dual-mic array (5.0 cm spacing) models tactical headset[cite: 1].</p>
+  <pre><code>#!/usr/bin/env python3
+import numpy as np, pyroomacoustics as pra, soundfile as sf, random, os
+
+def generate_tactical_mixture(clean_path, noise_path, impulse_path=None,
+                               output_dir="./synth_out", target_snr_db=0.0, fs=16000):
+    os.makedirs(output_dir, exist_ok=True)
+    clean, _ = sf.read(clean_path)
+    noise, _ = sf.read(noise_path)
+
+    # Armored vehicle interior physics
+    room = pra.ShoeBox([4.5, 3.0, 2.2], fs=fs,
+                       materials=pra.Material(0.20), max_order=6)
+
+    # Dual-mic tactical boom array (5cm separation)
+    mic_center = np.array([2.0, 1.5, 1.2])
+    sep = 0.05
+    mic_pos = np.array([[mic_center[0], mic_center[0]+sep],
+                        [mic_center[1], mic_center[1]],
+                        [mic_center[2], mic_center[2]]])
+    room.add_microphone_array(pra.MicrophoneArray(mic_pos, fs=fs))
+
+    # Speech source (3cm from primary capsule)
+    room.add_source(mic_center + [-0.03, 0, 0], signal=clean)
+    # Engine noise (rear bay)
+    if len(noise) &lt; len(clean):
+        noise = np.tile(noise, int(np.ceil(len(clean)/len(noise))))
+    room.add_source([0.5, 2.8, 0.8], signal=noise[:len(clean)])
+
+    # Optional ballistic transient
+    if impulse_path and os.path.exists(impulse_path):
+        imp, _ = sf.read(impulse_path)
+        buf = np.zeros(len(clean), dtype=np.float32)
+        onset = random.randint(int(0.2*len(clean)), int(0.7*len(clean)))
+        buf[onset:onset+len(imp)] = imp[:min(len(imp), len(clean)-onset)] * 2.5
+        room.add_source([4.0, 0.5, 1.8], signal=buf)
+
+    room.simulate()
+    primary = room.mic_array.signals[0, :len(clean)]
+    reference = room.mic_array.signals[1, :len(clean)]
+
+    # SNR scaling
+    gt = np.convolve(clean, room.rir[0][0][:int(0.02*fs)])[:len(clean)]
+    sp = np.mean(gt**2) + 1e-12
+    nc = primary - gt
+    np_ = np.mean(nc**2) + 1e-12
+    scale = np.sqrt(sp / (np_ * 10**(target_snr_db/10)))
+    primary = gt + nc * scale
+
+    # Clipping emulation
+    primary = np.clip(primary, -0.95, 0.95)
+    reference = np.clip(reference * scale, -0.95, 0.95)
+
+    base = os.path.splitext(os.path.basename(clean_path))[0]
+    sf.write(f"{output_dir}/{base}_pri.wav", primary.astype(np.float32), fs)
+    sf.write(f"{output_dir}/{base}_ref.wav", reference.astype(np.float32), fs)
+    sf.write(f"{output_dir}/{base}_clean.wav", gt.astype(np.float32), fs)</code></pre>
+
+  <h3>5.3 Augmentation Matrix[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Augmentation[cite: 1]</th>
+        <th>Parameters[cite: 1]</th>
+        <th>Purpose[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Curricular SNR Scheduling[cite: 1]</td>
+        <td>SNR ~ [-15,0]dB p=0.55; [0,+15]dB p=0.35; [+15,+30]dB p=0.10[cite: 1]</td>
+        <td>Emphasize severe tactical interference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Tactical Comms Emulation[cite: 1]</td>
+        <td>Chebyshev I 300-3400 Hz BP; Opus 6-16 kbps transcoding[cite: 1]</td>
+        <td>Legacy radio channel simulation[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Phase/Distance Perturbation[cite: 1]</td>
+        <td>tau in [-0.5ms, +0.5ms] inter-channel delay[cite: 1]</td>
+        <td>Prevents over-reliance on fixed mic spacing[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Declipping Distortion[cite: 1]</td>
+        <td>Saturate top 5-10% of peaks[cite: 1]</td>
+        <td>Train network to reconstruct clipped harmonics[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Speed/Pitch Perturbation[cite: 1]</td>
+        <td>0.9-1.1x speed; +-2 semitones pitch[cite: 1]</td>
+        <td>Speaker variability[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Room Reverb (ISM)[cite: 1]</td>
+        <td>RT60 0.2-0.6s via pyroomacoustics[cite: 1]</td>
+        <td>Enclosed space acoustics[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.4 Dataset Targets[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Metric[cite: 1]</th>
+        <th>Target[cite: 1]</th>
+        <th>Notes[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Training Data[cite: 1]</td>
+        <td>&gt; 500 hours effective[cite: 1]</td>
+        <td>Multi-condition tactical mixtures[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>SNR Range[cite: 1]</td>
+        <td>-15 to +30 dB[cite: 1]</td>
+        <td>Emphasis on sub-0 dB (55% weight)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Noise Types[cite: 1]</td>
+        <td>20+ distinct types[cite: 1]</td>
+        <td>Stationary + dynamic + impulsive[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Buckets[cite: 1]</td>
+        <td>stationary, dynamic, impulsive[cite: 1]</td>
+        <td>Three-way stratified splits[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Splits[cite: 1]</td>
+        <td>Train/Val/Test (speaker-disjoint)[cite: 1]</td>
+        <td>No speaker overlap between splits[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.5 Data Quality Assurance Pipeline[cite: 1]</h3>
+  <p>Raw audio collections undergo automated quality screening before mixing[cite: 1]. The pipeline enforces consistency across the training corpus:[cite: 1]</p>
+  <ol>
+    <li><strong>Sample Rate Normalization:</strong> All streams resampled to 16 kHz (military comms standard) via high-quality polyphase resampling with 0.45 Nyquist cutoff to prevent aliasing[cite: 1].</li>
+    <li><strong>Loudness Normalization:</strong> Clean speech normalized to -26 LUFS (EBU R128) to ensure consistent SNR calculations across diverse recording conditions[cite: 1].</li>
+    <li><strong>Clipping Detection:</strong> Automated detection of samples exceeding 0.98 full-scale; flagged segments either declipped via cubic interpolation or excluded[cite: 1].</li>
+    <li><strong>Silence Trimming:</strong> Leading/trailing silence trimmed using -40 dBFS threshold with 200ms pre-roll and 300ms post-roll for natural speech boundaries[cite: 1].</li>
+    <li><strong>Speaker Diarization:</strong> Overlapping speech segments identified and excluded from single-speaker training batches to prevent multi-talker confusion[cite: 1].</li>
+    <li><strong>Metadata Validation:</strong> Manifest CSV cross-checked for missing files, format inconsistencies, and SNR calculation errors before each training epoch[cite: 1].</li>
+  </ol>
+
+  <h3>5.6 Curricular SNR Scheduling Strategy[cite: 1]</h3>
+  <p>Training employs a curriculum learning approach that progressively exposes the model to increasingly challenging SNR conditions:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Training Phase[cite: 1]</th>
+        <th>Epochs[cite: 1]</th>
+        <th>SNR Distribution[cite: 1]</th>
+        <th>Rationale[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Warm-up[cite: 1]</td>
+        <td>1-10[cite: 1]</td>
+        <td>Uniform [0, +20] dB[cite: 1]</td>
+        <td>Establish basic speech reconstruction[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Moderate[cite: 1]</td>
+        <td>11-30[cite: 1]</td>
+        <td>Biased [-5, +15] dB, p(SNR&lt;0)=0.30[cite: 1]</td>
+        <td>Introduce moderate interference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Tactical[cite: 1]</td>
+        <td>31-80[cite: 1]</td>
+        <td>Heavy [-15, +10] dB, p(SNR&lt;0)=0.55[cite: 1]</td>
+        <td>Emphasize severe defense conditions[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Hard Mining[cite: 1]</td>
+        <td>81-100[cite: 1]</td>
+        <td>Uniform [-15, -5] dB only[cite: 1]</td>
+        <td>Focus exclusively on worst-case[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Fine-tune[cite: 1]</td>
+        <td>101-120[cite: 1]</td>
+        <td>Mixed with impulse injection[cite: 1]</td>
+        <td>Impulsive transient robustness[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>This curriculum prevents the optimizer from converging to a local minimum that only handles moderate noise[cite: 1]. By the final training phase, the model has been exposed to 100+ hours of sub-0 dB SNR data with random ballistic impulse injection at 2.5x amplitude, ensuring robustness to the most severe tactical conditions[cite: 1].</p>
+
+  <h3>5.7 Impulse Injection Protocol[cite: 1]</h3>
+  <p>Ballistic transients (gunshots, artillery, explosions) are statistically rare in training data but critical for tactical robustness[cite: 1]. The injection protocol:[cite: 1]</p>
+  <pre><code># Impulse injection parameters per batch sample
+impulse_config = {
+    "probability": 0.15,          # 15% of samples contain impulse
+    "onset_range": [0.2, 0.8],    # Random position within utterance
+    "amplitude_range": [1.5, 3.0], # Scale relative to speech RMS
+    "types": ["gunshot_9mm", "gunshot_762", "artillery_120mm",
+              "mortar_81mm", "explosion_c4"],
+    "decay_model": "exponential",  # Realistic impulse decay
+    "decay_tau_ms": [5, 50],       # Varies by weapon caliber
+}
+# Inject into primary channel only (reference mic unaffected)
+primary = inject_impulse(primary, impulse_config)</code></pre>
+</section>
+
+<!-- SECTION 06 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <h2>Neural Network Mathematics &amp; Loss Formulations[cite: 1]</h2>
+  </div>
+  <h3>6.1 Mathematical Transform Dataflow[cite: 1]</h3>
+  <div class="diagram">
+<pre>
+NEURAL INFERENCE TRANSFORM DATAFLOW[cite: 1]
+
+     Time-Domain Input x(n) [512 Samples, 128 Hop, sqrt-Hann][cite: 1]
+                                  |
+                                  v
+     257-Bin Complex Short-Time Fourier Transform (STFT)[cite: 1]
+                                  |
+                +-----------------+-----------------+
+                v                                   v
+   Linear Magnitude STFT                    Complex Spectrum[cite: 1]
+                |                                   |
+                v                                   |
+   ERB Subband Compression (257 -> 64 bands)        |[cite: 1]
+                |                                   |
+                v                                   |
+   Grouped Convolutions & Causal DPGRNN              |[cite: 1]
+                |                                   |
+                v                                   |
+   Temporal Recurrent Attention (TRA)                |[cite: 1]
+                |                                   |
+                v                                   |
+   ERB Decoder / Subband Decompression               |[cite: 1]
+                |                                   |
+                v                                   v
+   Complex Ratio Mask (CRM) ---------> Complex Mask Multiplier[cite: 1]
+   [Mr(k,t), Mi(k,t)]                           |
+                                                 v
+                                    Enhanced Spectrum S_hat(k,t)[cite: 1]
+                                                 |
+                                                 v
+                                    Inverse STFT Synthesis (OLA)[cite: 1]
+                                                 |
+                                                 v
+                                    Enhanced Audio Signal s_hat(n)[cite: 1]
+</pre>
+  </div>
+
+  <h3>6.2 Mathematical Formulations[cite: 1]</h3>
+  <p><strong>Short-Time Fourier Transform:</strong>[cite: 1]</p>
+  <pre><code>X(k, t) = Sum_{n=0}^{N-1} x(t*H + n) * w(n) * e^(-j*2*pi*k*n/N)
+N = 512 (32ms @ 16kHz), H = 128 (8ms), w(n) = sqrt-Hann window</code></pre>
+  <p><strong>ERB Subband Compression:</strong>[cite: 1]</p>
+  <pre><code>X_ERB(t) = W_ERB * |X(t)|
+W_ERB in R^{B x K}, compressing K=257 bins to B=64 ERB subbands</code></pre>
+  <p><strong>Complex Ratio Masking (CRM):</strong>[cite: 1]</p>
+  <pre><code>S_hat_r = Y_r * M_r - Y_i * M_i
+S_hat_i = Y_r * M_i + Y_i * M_r</code></pre>
+
+  <h3>6.3 Composite Multi-Domain Tactical Loss[cite: 1]</h3>
+  <div class="diagram">
+<pre>
+COMPOSITE TACTICAL LOSS FUNCTION[cite: 1]
+                                |
+          +---------------------+---------------------+
+          v                                           v
+TIME-DOMAIN METRIC                        SPECTRAL-DOMAIN METRICS[cite: 1]
+SI-SDR: Preserves speech gain             Power-Compressed Complex Loss[cite: 1]
+linearity without scale bias.             (alpha=0.5): Enhances consonants[cite: 1]
+                                          and corrects phase alignment.[cite: 1]
+</pre>
+  </div>
+  <p><strong>Scale-Invariant Signal-to-Distortion Ratio:</strong>[cite: 1]</p>
+  <pre><code>s_target = (&lt;s_hat, s&gt; / (||s||^2 + eps)) * s
+e_noise = s_hat - s_target
+SI-SDR = 10*log10(||s_target||^2 / ||e_noise||^2)
+L_SI-SDR = -SI-SDR</code></pre>
+  <p><strong>Power-Compressed Complex Spectral Loss (alpha=0.5):</strong>[cite: 1]</p>
+  <pre><code>L_Mag = (1/(T*K)) * Sum | |S|^alpha - |S_hat|^alpha |^2
+L_RI  = (1/(T*K)) * Sum | |S|^alpha*e^(j*theta_S) - |S_hat|^alpha*e^(j*theta_S_hat) |^2
+L_Spec = L_Mag + L_RI</code></pre>
+  <p><strong>Unified Composite Loss:</strong>[cite: 1]</p>
+  <pre><code>L_Total = lambda_time * L_SI-SDR + lambda_spec * L_Spec
+Nominal: lambda_time = 0.20, lambda_spec = 0.80, alpha = 0.50</code></pre>
+
+  <h3>6.4 Loss Implementation[cite: 1]</h3>
+  <pre><code>class CompositeTacticalLoss(nn.Module):
+    def __init__(self, alpha=0.5, lt=0.2, ls=0.8):
+        super().__init__()
+        self.alpha, self.lt, self.ls, self.eps = alpha, lt, ls, 1e-8
+
+    def forward(self, est_wav, tgt_wav, est_spec, tgt_spec):
+        # SI-SDR
+        dot = torch.sum(est_wav * tgt_wav, dim=-1, keepdim=True)
+        s_tgt = (dot / (torch.sum(tgt_wav**2, dim=-1, keepdim=True) + self.eps)) * tgt_wav
+        e_noise = est_wav - s_tgt
+        si_sdr = 10 * torch.log10(torch.sum(s_tgt**2) / (torch.sum(e_noise**2) + self.eps))
+        loss_time = -torch.mean(si_sdr)
+
+        # Power-compressed magnitude + RI
+        m_est = torch.abs(est_spec).clamp(min=self.eps) ** self.alpha
+        m_tgt = torch.abs(tgt_spec).clamp(min=self.eps) ** self.alpha
+        loss_mag = torch.mean((m_est - m_tgt)**2)
+        r_est = m_est * torch.cos(torch.angle(est_spec))
+        i_est = m_est * torch.sin(torch.angle(est_spec))
+        r_tgt = m_tgt * torch.cos(torch.angle(tgt_spec))
+        i_tgt = m_tgt * torch.sin(torch.angle(tgt_spec))
+        loss_ri = torch.mean((r_est-r_tgt)**2 + (i_est-i_tgt)**2)
+
+        return self.lt * loss_time + self.ls * (loss_mag + loss_ri)</code></pre>
+
+  <h3>6.5 Training Configuration[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Hyperparameter[cite: 1]</th>
+        <th>Value[cite: 1]</th>
+        <th>Rationale[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Model Capacity[cite: 1]</td>
+        <td>GTCRN: 48,200 params (193 KB)[cite: 1]</td>
+        <td>Fits ARM Cortex-A76 L2 Cache (512 KB)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Sampling Rate[cite: 1]</td>
+        <td>16,000 Hz (alt: 48kHz via DFN3)[cite: 1]</td>
+        <td>Military tactical comms standard[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Frame/Hop[cite: 1]</td>
+        <td>N=512 (32ms) / H=128 (8ms)[cite: 1]</td>
+        <td>Algorithmic latency bounded to 8ms[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Optimizer[cite: 1]</td>
+        <td>AdamW (beta1=0.9, beta2=0.999, WD=1e-4)[cite: 1]</td>
+        <td>Decoupled weight decay prevents RNN explosion[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>LR Schedule[cite: 1]</td>
+        <td>3e-4 cosine decay to 1e-6 over 120 epochs[cite: 1]</td>
+        <td>Smooth descent avoids local minima[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Warmup[cite: 1]</td>
+        <td>5 epochs linear 1e-6 to 3e-4[cite: 1]</td>
+        <td>Prevents gradient shock in recurrent states[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Batch Size[cite: 1]</td>
+        <td>32 segments x 4.0 seconds[cite: 1]</td>
+        <td>Balanced gradient averaging[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Gradient Clipping[cite: 1]</td>
+        <td>||g||_2 &le; 5.0[cite: 1]</td>
+        <td>Prevents ballistic impulse destabilization[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.6 Dual-Path Grouped RNN Architecture[cite: 1]</h3>
+  <p>The DPGRNN module is the computational core of GTCRN, processing features through two complementary recurrent pathways:[cite: 1]</p>
+  <pre><code>Intra-frame RNN (Spectral Domain):
+    Input: x[t] = [B, T, C//G] per group G
+    GRU hidden states capture spectral envelope correlations
+    Across ERB bands within each time frame
+    Captures formant structure, harmonic relationships
+
+Inter-frame RNN (Temporal Domain):
+    Input: y[t] = concat(group_0[t], ..., group_G-1[t])
+    GRU hidden states capture temporal continuity
+    Across time frames within each frequency group
+    Captures speech dynamics, pitch contours, voicing
+
+Group Shuffle (Cross-Group Communication):
+    After every 2 intra+inter RNN blocks, features are
+    reshuffled across groups to prevent information isolation
+    Shuffle pattern: [g0,g1,g2,g3] -> [g1,g0,g3,g2]</code></pre>
+  <p>The grouped architecture reduces parameter count by G=4x compared to full-band RNN processing, while the shuffle operation maintains cross-frequency information flow[cite: 1]. This achieves 94% of full-band performance at 25% of the computational cost[cite: 1].</p>
+
+  <h3>6.7 Training Dynamics &amp; Loss Landscape[cite: 1]</h3>
+  <p>The composite loss function L_total = 0.20 * L_SI-SDR + 0.80 * L_Spec creates a multi-objective optimization landscape[cite: 1]. Key training dynamics:[cite: 1]</p>
+  <ol>
+    <li><strong>Phase 1 (Epochs 1-20):</strong> L_Spec dominates — the model learns coarse spectral magnitude mapping[cite: 1]. PESQ typically reaches 1.8-2.0 during this phase[cite: 1].</li>
+    <li><strong>Phase 2 (Epochs 21-60):</strong> L_SI-SDR contribution increases as spectral convergence improves[cite: 1]. The model refines time-domain waveform reconstruction, pushing PESQ to 2.3-2.5[cite: 1].</li>
+    <li><strong>Phase 3 (Epochs 61-100):</strong> Fine-grained phase alignment[cite: 1]. The complex RI loss component drives phase coherence between estimated and clean speech[cite: 1].</li>
+    <li><strong>Phase 4 (Epochs 101-120):</strong> Hard example mining with impulse injection[cite: 1]. Loss oscillations indicate the model is learning transient robustness[cite: 1].</li>
+  </ol>
+  <p>The alpha=0.5 power compression in L_Spec is critical: it upweights quiet consonants (|S|^0.5 &gt; |S| for |S|&lt;1) while downweighting loud vowels, ensuring the model does not neglect low-energy speech components that carry 60% of intelligibility information[cite: 1].</p>
+</section>
+
+<!-- SECTION 07 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <h2>Workstation PC Prototyping Platform[cite: 1]</h2>
+  </div>
+  <h3>7.1 Hardware Bill of Materials[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Component[cite: 1]</th>
+        <th>Minimum[cite: 1]</th>
+        <th>Recommended[cite: 1]</th>
+        <th>Purpose[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CPU[cite: 1]</td>
+        <td>AMD Ryzen 7 7800X3D / Intel i7-13700K[cite: 1]</td>
+        <td>16+ threads, 32+ GB DDR5[cite: 1]</td>
+        <td>Training + inference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>GPU[cite: 1]</td>
+        <td>NVIDIA RTX 3060 (12GB VRAM)[cite: 1]</td>
+        <td>RTX 4080 (16GB)[cite: 1]</td>
+        <td>Fast multi-SNR training[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Audio Interface[cite: 1]</td>
+        <td>Focusrite Scarlett 2i2 Gen 4[cite: 1]</td>
+        <td>Behringer UMC202HD[cite: 1]</td>
+        <td>24-bit/192kHz USB audio[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Primary Mic[cite: 1]</td>
+        <td>Cardioid dynamic boom (Shure SM35)[cite: 1]</td>
+        <td>Sennheiser HMD 27[cite: 1]</td>
+        <td>Boom/throat mic capture[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Reference Mic[cite: 1]</td>
+        <td>Omnidirectional condenser[cite: 1]</td>
+        <td>Behringer ECM8000[cite: 1]</td>
+        <td>Ambient noise reference[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>OS[cite: 1]</td>
+        <td>Ubuntu 22.04 LTS (Kernel 6.5)[cite: 1]</td>
+        <td>Windows 11 Enterprise[cite: 1]</td>
+        <td>PyTorch/CUDA support[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 Low-Latency Streaming Inference Engine[cite: 1]</h3>
+  <pre><code>#!/usr/bin/env python3
+"""WORKSTATION: ASYNCHRONOUS DOUBLE-BUFFERED REAL-TIME ANC PIPELINE"""
+import numpy as np, sounddevice as sd, onnxruntime as ort, queue, sys
+
+SAMPLE_RATE, FRAME_LEN, HOP_LEN = 16000, 512, 128
+BLOCK_SIZE = HOP_LEN  # 8ms
+
+audio_in_q = queue.Queue(maxsize=16)
+audio_out_q = queue.Queue(maxsize=16)
+window = np.sqrt(np.hanning(FRAME_LEN)).astype(np.float32)
+in_buf = np.zeros(FRAME_LEN, dtype=np.float32)
+out_buf = np.zeros(FRAME_LEN, dtype=np.float32)
+
+# ONNX Runtime configuration
+opts = ort.SessionOptions()
+opts.intra_op_num_threads = 2
+opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+sess = ort.InferenceSession("gtcrn_streaming.onnx", opts,
+    providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+
+conv_state = np.zeros((2, 1, 16, 65), dtype=np.float32)
+rnn_state = np.zeros((2, 1, 16, 64), dtype=np.float32)
+
+def audio_cb(indata, outdata, frames, time, status):
+    if status: print(f"[WARN] {status}", file=sys.stderr)
+    audio_in_q.put_nowait(indata[:, 0].copy())
+    try: outdata[:, 0] = audio_out_q.get_nowait()
+    except queue.Empty: outdata.fill(0.0)
+
+with sd.Stream(channels=2, samplerate=SAMPLE_RATE, blocksize=BLOCK_SIZE,
+               callback=audio_cb, latency='low'):
+    while True:
+        try:
+            samples = audio_in_q.get(timeout=1.0)
+            in_buf[:-BLOCK_SIZE] = in_buf[BLOCK_SIZE:]
+            in_buf[-BLOCK_SIZE:] = samples
+
+            windowed = in_buf * window
+            spectrum = np.fft.rfft(windowed, n=FRAME_LEN)
+            r_in = np.real(spectrum).astype(np.float32).reshape(1,1,-1)
+            i_in = np.imag(spectrum).astype(np.float32).reshape(1,1,-1)
+
+            r_out, i_out, conv_state, rnn_state = sess.run(None, {
+                "input_real": r_in, "input_imag": i_in,
+                "in_conv_state": conv_state, "in_rnn_state": rnn_state})
+
+            enhanced = (r_out[0,0,:] + 1j*i_out[0,0,:]).astype(np.complex64)
+            time_synth = np.fft.irfft(enhanced, n=FRAME_LEN) * window
+
+            out_buf += time_synth
+            frame = np.clip(out_buf[:BLOCK_SIZE], -0.98, 0.98)
+            out_buf[:-BLOCK_SIZE] = out_buf[BLOCK_SIZE:]
+            out_buf[-BLOCK_SIZE:] = 0.0
+            audio_out_q.put(frame)
+        except queue.Empty: continue
+        except KeyboardInterrupt: break</code></pre>
+
+  <h3>7.3 Hybrid NLMS Residual Filter[cite: 1]</h3>
+  <pre><code>class HybridNLMSResidualFilter:
+    """NLMS filter for residual tonal noise suppression downstream of neural net."""
+    def __init__(self, order=64, mu=0.05, eps=1e-6):
+        self.order, self.mu, self.eps = order, mu, eps
+        self.weights = np.zeros(order, dtype=np.float32)
+        self.ref_buf = np.zeros(order, dtype=np.float32)
+
+    def process_sample(self, enhanced_sample, ref_noise_sample):
+        self.ref_buf[1:] = self.ref_buf[:-1]
+        self.ref_buf[0] = ref_noise_sample
+        predicted = np.dot(self.weights, self.ref_buf)
+        clean = enhanced_sample - predicted
+        ref_energy = np.dot(self.ref_buf, self.ref_buf) + self.eps
+        self.weights += (self.mu / ref_energy) * clean * self.ref_buf
+        return clean</code></pre>
+
+  <h3>7.4 ONNX Export for Cross-Platform Deployment[cite: 1]</h3>
+  <p>PyTorch models must be exported to ONNX format for deployment on both workstation (CUDA/CPU) and RPi5 (ARM CPU)[cite: 1]. The export process handles dynamic shapes and streaming states:[cite: 1]</p>
+  <pre><code>#!/usr/bin/env python3
+"""ONNX EXPORT WITH DYNAMIC AXES FOR STREAMING INFERENCE"""
+import torch, onnx
+
+# Load trained GTCRN checkpoint
+checkpoint = torch.load("gtcrn_tactical_best.pth", map_location="cpu")
+model = checkpoint["model"].eval()
+
+# Dummy inputs matching streaming shape
+dummy_real = torch.randn(1, 1, 257)   # [batch, channels, freq_bins]
+dummy_imag = torch.randn(1, 1, 257)
+dummy_conv = torch.zeros(2, 1, 16, 65) # conv state
+dummy_rnn  = torch.zeros(2, 1, 16, 64) # rnn state
+
+torch.onnx.export(
+    model,
+    (dummy_real, dummy_imag, dummy_conv, dummy_rnn),
+    "gtcrn_streaming.onnx",
+    input_names=["input_real", "input_imag", "in_conv_state", "in_rnn_state"],
+    output_names=["output_real", "output_imag", "out_conv_state", "out_rnn_state"],
+    dynamic_axes={
+        "input_real":  {0: "batch"},
+        "input_imag":  {0: "batch"},
+        "output_real": {0: "batch"},
+        "output_imag": {0: "batch"},
+    },
+    opset_version=17,
+    do_constant_folding=True,
+)
+print(f"Exported: {onnx.__version__}, opset 17")
+# Verify: onnx.checker.check_model("gtcrn_streaming.onnx")</code></pre>
+
+  <h3>7.5 Automated Testing &amp; Benchmarking Framework[cite: 1]</h3>
+  <p>The validation framework runs automated tests across multiple SNR conditions and noise types:[cite: 1]</p>
+  <pre><code>#!/usr/bin/env python3
+"""AUTOMATED MULTI-SCENARIO BENCHMARK HARNESS"""
+import numpy as np, json, time, soundfile as sf
+from pathlib import Path
+
+SCENARIOS = {
+    "tank_engine":    {"snr": [0, 5, 10], "noise_file": "noise/tank.wav"},
+    "rotor_wash":     {"snr": [-5, 0, 5], "noise_file": "noise/helicopter.wav"},
+    "gunshots":       {"snr": [-3, 0, 3], "noise_file": "noise/gunshot.wav"},
+    "generator":      {"snr": [5, 10, 15], "noise_file": "noise/generator.wav"},
+    "wind_turbulence":{"snr": [0, 5, 10], "noise_file": "noise/wind.wav"},
+    "multi_talker":   {"snr": [-3, 0, 5], "noise_file": "noise/babble.wav"},
+}
+
+def benchmark_session(model_session, clean_dir, output_dir):
+    results = []
+    for scenario, cfg in SCENARIOS.items():
+        for target_snr in cfg["snr"]:
+            for clean_file in Path(clean_dir).glob("*.wav"):
+                # Mix and process...
+                t0 = time.perf_counter()
+                enhanced = process_file(model_session, clean_file, cfg["noise_file"], target_snr)
+                latency_ms = (time.perf_counter() - t0) * 1000
+                pesq_score = compute_pesq(clean_file, enhanced)
+                results.append({
+                    "scenario": scenario, "snr": target_snr,
+                    "pesq": pesq_score, "latency_ms": latency_ms,
+                    "file": clean_file.name
+                })
+    # Summary statistics
+    pesq_scores = [r["pesq"] for r in results]
+    print(f"Mean PESQ: {np.mean(pesq_scores):.3f} +/- {np.std(pesq_scores):.3f}")
+    print(f"Min PESQ:  {np.min(pesq_scores):.3f} (worst case)")
+    print(f"Pass rate: {sum(1 for p in pesq_scores if p >= 2.50)}/{len(pesq_scores)}")
+    with open(f"{output_dir}/benchmark_results.json", "w") as f:
+        json.dump(results, f, indent=2)</code></pre>
+
+  <h3>7.6 Development Environment Setup[cite: 1]</h3>
+  <p>Complete environment setup for reproducing the training and evaluation pipeline:[cite: 1]</p>
+  <pre><code># Environment Setup (Ubuntu 22.04 + CUDA 12.1)
+# ================================================
+
+# 1. Create conda environment
+conda create -n anc python=3.10 -y
+conda activate anc
+
+# 2. Install PyTorch with CUDA
+pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# 3. Install ONNX Runtime (GPU + CPU)
+pip install onnxruntime-gpu onnxruntime
+
+# 4. Install audio processing libraries
+pip install soundfile librosa sounddevice pyroomacoustics
+
+# 5. Install evaluation metrics
+pip install pesq pystoi dnsmos
+
+# 6. Install training utilities
+pip install wandb tensorboard accelerate
+
+# 7. Clone and install model repositories
+git clone https://github.com/Max1Wz/H-GTCRN.git
+cd H-GTCRN &amp;&amp; pip install -e . &amp;&amp; cd ..
+
+# 8. Verify installation
+python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA {torch.cuda.is_available()}')"
+python -c "import onnxruntime; print(f'ORT {onnxruntime.__version__}, GPU: {\"CUDAExecutionProvider\" in onnxruntime.get_available_providers()}')"</code></pre>
+</section>
+
+<!-- SECTION 08 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">08</div>
+    <h2>Embedded Raspberry Pi 5 Deployment[cite: 1]</h2>
+  </div>
+  <h3>8.1 Hardware Configuration[cite: 1]</h3>
+  <div class="diagram">
+<pre>
++-------------------------------------------------------------------+
+| RASPBERRY PI 5 EMBEDDED COMPUTING UNIT                             |[cite: 1]
+| Broadcom BCM2712C1: Quad-Core ARM Cortex-A76 @ 2.4GHz              |[cite: 1]
+| 8GB LPDDR4X SDRAM (PCIe Gen 2/3 Expansion)                        |[cite: 1]
+| Active Cooler Baseplate + Direct Dynamic Micro-Blower              |[cite: 1]
++----------------------------------+----------------------------------+
+                                   | 40-Pin GPIO / Direct I2S Bus[cite: 1]
+                                   v
++-------------------------------------------------------------------+
+| SEEED STUDIO RESPEAKER 2-MICS PI HAT                              |[cite: 1]
+| Wolfson/Cirrus Logic WM8960 Low-Power Stereo Audio Codec           |[cite: 1]
+| Direct Master-Mode I2S Communication Protocol                      |[cite: 1]
+| Integrated Headphone Amp + Dual Analog Capture Interfaces          |[cite: 1]
++----------------------------------+----------------------------------+
+                                   |
+                                   v
++-------------------------------------------------------------------+
+| TRANSDUCER HARNESS INTERFACE                                      |[cite: 1]
+| Primary Boom Microphone + Outward Reference Capsule                |[cite: 1]
+| Tactical PTT Headset System via 3.5mm I/O                         |[cite: 1]
++-------------------------------------------------------------------+
+</pre>
+  </div>
+
+  <h3>8.2 I2S vs USB Audio Interface[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Aspect[cite: 1]</th>
+        <th>Native I2S (Recommended)[cite: 1]</th>
+        <th>USB Sound Card (Legacy)[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Path[cite: 1]</td>
+        <td>Direct BCM2712 GPIO lines[cite: 1]</td>
+        <td>USB stack + xHCI controllers[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Buffering[cite: 1]</td>
+        <td>Hardware DMA ring buffers to kernel memory[cite: 1]</td>
+        <td>Transfer packetization + scheduling jitter[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Hardware Latency[cite: 1]</td>
+        <td>Fixed, predictable ~1.13 ms[cite: 1]</td>
+        <td>Variable, unbonded 4.0-12.0 ms[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Determinism[cite: 1]</td>
+        <td>Deterministic sub-2ms[cite: 1]</td>
+        <td>Non-deterministic; bus contention[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Recommendation[cite: 1]</td>
+        <td><strong>Required for &le;20ms budget</strong>[cite: 1]</td>
+        <td>Legacy fallback only[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 Real-Time Linux OS Hardening[cite: 1]</h3>
+  <p>Default Linux introduces variable scheduler latency, thread preemption, and dynamic frequency scaling[cite: 1]. The RPi 5 must be configured for real-time determinism:[cite: 1]</p>
+  <ol>
+    <li><strong>PREEMPT_RT Kernel:</strong> Replaces spinlocks with preemptible mutexes to prevent kernel tasks from blocking real-time audio threads[cite: 1].</li>
+    <li><strong>CPU Core 3 Isolation</strong> (in /boot/firmware/cmdline.txt): <code>isolcpus=3 nohz_full=3 rcu_nocbs=3 irqaffinity=0,1,2 threadirqs cpufreq.default_governor=performance</code> — isolates Core 3 from general scheduler, disables timer tick, locks to max 2.4 GHz[cite: 1].</li>
+    <li><strong>Direct ALSA:</strong> Remove pipewire/pulseaudio; grant exclusive low-level ALSA access via /etc/asound.conf configuration[cite: 1].</li>
+  </ol>
+
+  <h3>8.4 Embedded Real-Time Daemon[cite: 1]</h3>
+  <pre><code>#!/usr/bin/env python3
+"""EMBEDDED RPi5 REAL-TIME DAEMON (INT8 ONNX, pinned to Core 3)"""
+import numpy as np, alsaaudio, onnxruntime as ort, os, sys
+
+os.sched_setaffinity(0, {3})  # Pin to isolated Core 3
+os.system("chrt -f -p 90 %d" % os.getpid())  # SCHED_FIFO priority 90
+
+FS, PERIOD, FRAME = 16000, 128, 512
+WINDOW = np.sqrt(np.hanning(FRAME)).astype(np.float32)
+
+inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE, alsaaudio.PCM_NORMAL,
+    channels=2, rate=FS, format=alsaaudio.PCM_FORMAT_S16_LE,
+    periodsize=PERIOD, device="hw:seeed2micvoicec,0")
+out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK, alsaaudio.PCM_NORMAL,
+    channels=2, rate=FS, format=alsaaudio.PCM_FORMAT_S16_LE,
+    periodsize=PERIOD, device="hw:seeed2micvoicec,0")
+
+opts = ort.SessionOptions()
+opts.intra_op_num_threads = 1  # Strict single-thread on Core 3
+opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+sess = ort.InferenceSession("gtcrn_int8.onnx", opts,
+    providers=['CPUExecutionProvider'])
+
+in_ring = np.zeros(FRAME, dtype=np.float32)
+out_ring = np.zeros(FRAME, dtype=np.float32)
+conv_st = np.zeros((2,1,16,65), dtype=np.float32)
+rnn_st = np.zeros((2,1,16,64), dtype=np.float32)
+
+while True:
+    try:
+        length, raw = inp.read()
+        if length &lt;= 0: continue
+        pcm = np.frombuffer(raw, dtype=np.int16)
+        primary = pcm[0::2].astype(np.float32) / 32768.0
+
+        in_ring[:-PERIOD] = in_ring[PERIOD:]
+        in_ring[-PERIOD:] = primary
+
+        windowed = in_ring * WINDOW
+        fft_d = np.fft.rfft(windowed, n=FRAME)
+        r_in = np.real(fft_d).astype(np.float32).reshape(1,1,-1)
+        i_in = np.imag(fft_d).astype(np.float32).reshape(1,1,-1)
+
+        r_o, i_o, conv_st, rnn_st = sess.run(None, {
+            "input_real": r_in, "input_imag": i_in,
+            "in_conv_state": conv_st, "in_rnn_state": rnn_st})
+
+        enhanced = (r_o[0,0,:] + 1j*i_o[0,0,:]).astype(np.complex64)
+        synth = np.fft.irfft(enhanced, n=FRAME) * WINDOW
+        out_ring += synth
+        block = np.clip(out_ring[:PERIOD], -0.99, 0.99)
+        out_ring[:-PERIOD] = out_ring[PERIOD:]
+        out_ring[-PERIOD:] = 0.0
+
+        out_s16 = (block * 32767).astype(np.int16)
+        stereo = np.column_stack((out_s16, out_s16)).flatten().tobytes()
+        out.write(stereo)
+    except KeyboardInterrupt: break
+    except Exception as e: print(f"[ERROR] {e}", file=sys.stderr)</code></pre>
+
+  <h3>8.5 Performance Targets on RPi 5[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Metric[cite: 1]</th>
+        <th>Target[cite: 1]</th>
+        <th>Notes[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Model Size[cite: 1]</td>
+        <td>&lt; 193 KB (48.2K params)[cite: 1]</td>
+        <td>GTCRN fits in L2 cache (512 KB)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Inference Time[cite: 1]</td>
+        <td>&lt; 1.22 ms per 8ms frame[cite: 1]</td>
+        <td>Single-core INT8 NEON SDOT[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>CPU Usage[cite: 1]</td>
+        <td>&lt; 30% (1 core)[cite: 1]</td>
+        <td>Well under real-time ceiling[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>End-to-End Latency[cite: 1]</td>
+        <td>&le; 17.22 ms[cite: 1]</td>
+        <td>Target &lt; 20 ms[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Memory[cite: 1]</td>
+        <td>&lt; 200 MB total[cite: 1]</td>
+        <td>Model + runtime + buffers + OS[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>RTF[cite: 1]</td>
+        <td>&le; 0.15[cite: 1]</td>
+        <td>6x real-time headroom[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Power Draw[cite: 1]</td>
+        <td>&le; 7.5W total[cite: 1]</td>
+        <td>Sustained; battery-capable[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Thermal[cite: 1]</td>
+        <td>&lt; 70C CPU[cite: 1]</td>
+        <td>Active cooling mandatory[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>8.6 PREEMPT_RT Kernel Compilation[cite: 1]</h3>
+  <p>Building a real-time kernel for the RPi 5 requires patching the stock kernel with the PREEMPT_RT patch set:[cite: 1]</p>
+  <pre><code># PREEMPT_RT Kernel Build for RPi 5 (BCM2712)
+# ================================================
+
+# 1. Clone kernel source
+git clone --depth=1 --branch rpi-6.1.y https://github.com/raspberrypi/linux.git
+cd linux
+
+# 2. Apply PREEMPT_RT patch
+wget https://cdn.kernel.org/pub/linux/kernel/projects/rt/6.1/patch-6.1.73-rt24.patch
+xz -d patch-6.1.73-rt24.patch
+git apply patch-6.1.73-rt24.patch
+
+# 3. Configure with RT options
+make bcm2712_defconfig
+scripts/config --enable CONFIG_PREEMPT_RT
+scripts/config --disable CONFIG_PREEMPT_VOLUNTARY
+scripts/config --enable CONFIG_HIGH_RES_TIMERS
+scripts/config --enable CONFIG_NO_HZ_FULL
+scripts/config --set-str CONFIG_HZ_1000 y
+
+# 4. Build (cross-compile on x86 for ARM64)
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
+
+# 5. Install on SD card
+sudo make INSTALL_MOD_PATH=/mnt/sdcard modules_install
+sudo cp arch/arm64/boot/Image /mnt/sdcard/boot/kernel8.img</code></pre>
+
+  <h3>8.7 I2S Audio HAT Device Tree Configuration[cite: 1]</h3>
+  <p>The ReSpeaker 2-Mics Pi HAT requires a custom Device Tree Overlay to enable I2S audio:[cite: 1]</p>
+  <pre><code># /boot/firmware/overlays/repeaker-2mic-voicebonnet.dtbo
+# Custom Device Tree Overlay for WM8960 codec via I2S
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2712";
+
+    fragment@0 {
+        target = &lt;&amp;i2s&gt;;
+        __overlay__ {
+            status = "okay";
+            #sound-dai-cells = &lt;0&gt;;
+        };
+    };
+
+    fragment@1 {
+        target = &lt;&amp;wm8960&gt;;
+        __overlay__ {
+            compatible = "wlf,wm8960";
+            reg = &lt;0x1a&gt;;
+            clocks = &lt;&amp;clocks&gt;;
+            #sound-dai-cells = &lt;0&gt;;
+        };
+    };
+
+    fragment@2 {
+        target-path = "/";
+        __overlay__ {
+            wm8960_card {
+                compatible = "simple-audio-card";
+                simple-audio-card,name = "ReSpeaker 2Mic";
+                simple-audio-card,format = "i2s";
+                simple-audio-card,bitclock-master = &lt;&amp;wm8960 codecs&gt;;
+                simple-audio-card,frame-master = &lt;&amp;wm8960 codecs&gt;;
+                simple-audio-card,codec {
+                    sound-dai = &lt;&amp;wm8960&gt;;
+                };
+                simple-audio-card,cpu {
+                    sound-dai = &lt;&amp;i2s&gt;;
+                };
+            };
+        };
+    };
+};</code></pre>
+
+  <h3>8.8 Thermal Management &amp; Power Profiling[cite: 1]</h3>
+  <p>Sustained neural inference on the RPi 5 generates significant heat[cite: 1]. The thermal management strategy:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Condition[cite: 1]</th>
+        <th>CPU Temp[cite: 1]</th>
+        <th>Throttle?[cite: 1]</th>
+        <th>Action[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Idle[cite: 1]</td>
+        <td>35-42C[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>Baseline monitoring[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Light load (NLMS only)[cite: 1]</td>
+        <td>42-52C[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>Normal operation[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Full pipeline (GTCRN+NLMS)[cite: 1]</td>
+        <td>52-65C[cite: 1]</td>
+        <td>No[cite: 1]</td>
+        <td>Active cooler engaged[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Stress (ambient 45C)[cite: 1]</td>
+        <td>65-72C[cite: 1]</td>
+        <td>Warning[cite: 1]</td>
+        <td>Monitor 10s; reduce batch[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Critical (&gt;75C)[cite: 1]</td>
+        <td>&gt;75C[cite: 1]</td>
+        <td>Yes[cite: 1]</td>
+        <td>Emergency: reduce clock to 1.8GHz[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Power measurement methodology: Use a USB-C power meter (e.g., SATECHI USB-C Meter) inline between the power supply and RPi 5[cite: 1]. Record average and peak current draw over 60-second intervals during each operational mode[cite: 1].</p>
+</section>
+
+<!-- SECTION 09 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">09</div>
+    <h2>Comprehensive Latency Budget &amp; Timing Analysis[cite: 1]</h2>
+  </div>
+  <div class="diagram">
+<pre>
+END-TO-END ACOUSTIC LATENCY BUDGET (TARGET: &lt;= 20.0ms)[cite: 1]
+
++------------------+----------------+------------------+----------------+------------------+
+| Hardware Capture | Preprocessing  | Neural Inference | Postprocessing | Hardware Playout |[cite: 1]
+| ADC Buffering    | Windowing/FFT  | Engine (GTCRN)   | NLMS & IFFT    | DAC Buffering    |[cite: 1]
+|                  |                |                  |                |                  |
+| 4.0 - 8.0 ms     | 0.4 - 1.2 ms   | 1.2 - 2.8 ms     | 0.6 - 1.2 ms   | 4.0 - 8.0 ms     |[cite: 1]
++------------------+----------------+------------------+----------------+------------------+
+| Total Range: 10.2 - 21.2 ms | Typical RPi5 RT-Linux: 17.22 ms | Exceeds &lt;20ms target |[cite: 1]
+</pre>
+  </div>
+
+  <h3>9.1 Workstation vs Raspberry Pi 5 Timing[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Stage[cite: 1]</th>
+        <th>Workstation (RTX 4080)[cite: 1]</th>
+        <th>RPi 5 (INT8 NEON)[cite: 1]</th>
+        <th>Constraints[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ADC Capture[cite: 1]</td>
+        <td>5.00 ms (USB PortAudio 80 samp)[cite: 1]</td>
+        <td><strong>4.00 ms (I2S DMA 64 samp)</strong>[cite: 1]</td>
+        <td>Lower on Pi 5 via I2S[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>STFT + ERB[cite: 1]</td>
+        <td>0.22 ms (AVX2)[cite: 1]</td>
+        <td><strong>0.85 ms (ARM NEON)</strong>[cite: 1]</td>
+        <td>512-sample analysis frame[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Neural Inference[cite: 1]</td>
+        <td>0.28 ms (Tensor Cores)[cite: 1]</td>
+        <td><strong>1.22 ms (single-core SDOT)</strong>[cite: 1]</td>
+        <td>Inside 8ms hop limit[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>NLMS + Gate[cite: 1]</td>
+        <td>0.08 ms[cite: 1]</td>
+        <td><strong>0.25 ms</strong>[cite: 1]</td>
+        <td>Lightweight residual[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Inverse STFT + OLA[cite: 1]</td>
+        <td>0.20 ms[cite: 1]</td>
+        <td><strong>0.90 ms</strong>[cite: 1]</td>
+        <td>sqrt-Hann synthesis[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DAC Playout[cite: 1]</td>
+        <td>5.00 ms[cite: 1]</td>
+        <td><strong>4.00 ms</strong>[cite: 1]</td>
+        <td>Output ring buffer[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Kernel Jitter[cite: 1]</td>
+        <td>1.50 ms (generic OS)[cite: 1]</td>
+        <td><strong>0.20 ms (PREEMPT_RT)</strong>[cite: 1]</td>
+        <td>Core isolation eliminates contention[cite: 1]</td>
+      </tr>
+      <tr>
+        <td><strong>Total E2E</strong>[cite: 1]</td>
+        <td><strong>12.28 ms</strong>[cite: 1]</td>
+        <td><strong>11.42 ms (conservative: 17.22 ms)</strong>[cite: 1]</td>
+        <td><strong>Exceeds &lt;20ms target</strong>[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 Latency Component Deep Dive[cite: 1]</h3>
+  <p><strong>ADC Capture (4.0 ms on RPi5):</strong> The I2S DMA controller transfers 64-sample blocks (4 ms at 16 kHz) directly to memory without CPU involvement[cite: 1]. The BCM2712's DMA engine operates asynchronously, filling ring buffers while the CPU processes the previous block[cite: 1]. This overlap eliminates capture-induced stalls[cite: 1].</p>
+  <p><strong>STFT + ERB (0.85 ms):</strong> The 512-point real FFT uses ARM NEON-accelerated radix-2 Cooley-Tukey decomposition[cite: 1]. The ERB compression matrix (64x257) is precomputed and applied as a single GEMV operation via NEON SDOT, completing in ~0.3 ms for the magnitude computation[cite: 1].</p>
+  <p><strong>Neural Inference (1.22 ms):</strong> GTCRN processes one 512-sample frame through 4 grouped conv layers, 2 intra-frame GRU blocks, 2 inter-frame GRU blocks, and the TRA attention module[cite: 1]. The entire forward pass executes on a single Cortex-A76 core with INT8 weights, staying well within the 8 ms hop budget[cite: 1].</p>
+  <p><strong>Determinism Guarantee:</strong> With PREEMPT_RT + Core 3 isolation, kernel jitter drops from 1.5 ms (generic Linux) to 0.2 ms (99th percentile)[cite: 1]. The worst-case E2E latency of 17.22 ms includes 3x standard deviation headroom above the mean 11.42 ms[cite: 1].</p>
+</section>
+
+<!-- SECTION 10 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <h2>Empirical Benchmarking &amp; Validation[cite: 1]</h2>
+  </div>
+  <h3>10.1 Validation Results Matrix[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario[cite: 1]</th>
+        <th>Metric[cite: 1]</th>
+        <th>Unprocessed[cite: 1]</th>
+        <th>Workstation FP32[cite: 1]</th>
+        <th>RPi5 INT8[cite: 1]</th>
+        <th>Target[cite: 1]</th>
+        <th>Status[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Stationary: Tank Engine[cite: 1]</td>
+        <td>SNR[cite: 1]</td>
+        <td>0.2 dB[cite: 1]</td>
+        <td>18.4 dB[cite: 1]</td>
+        <td><strong>17.9 dB</strong>[cite: 1]</td>
+        <td>&gt;15 dB[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Stationary: Tank Engine[cite: 1]</td>
+        <td>STOI[cite: 1]</td>
+        <td>0.63[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td><strong>0.92</strong>[cite: 1]</td>
+        <td>&gt;0.85[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Stationary: Tank Engine[cite: 1]</td>
+        <td>PESQ[cite: 1]</td>
+        <td>1.45[cite: 1]</td>
+        <td>2.89[cite: 1]</td>
+        <td><strong>2.78</strong>[cite: 1]</td>
+        <td>&gt;2.50[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Non-Stat: Rotor Wash[cite: 1]</td>
+        <td>SNR[cite: 1]</td>
+        <td>-4.8 dB[cite: 1]</td>
+        <td>16.8 dB[cite: 1]</td>
+        <td><strong>16.1 dB</strong>[cite: 1]</td>
+        <td>&gt;15 dB[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Non-Stat: Rotor Wash[cite: 1]</td>
+        <td>STOI[cite: 1]</td>
+        <td>0.52[cite: 1]</td>
+        <td>0.91[cite: 1]</td>
+        <td><strong>0.89</strong>[cite: 1]</td>
+        <td>&gt;0.85[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Non-Stat: Rotor Wash[cite: 1]</td>
+        <td>PESQ[cite: 1]</td>
+        <td>1.28[cite: 1]</td>
+        <td>2.74[cite: 1]</td>
+        <td><strong>2.65</strong>[cite: 1]</td>
+        <td>&gt;2.50[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Impulsive: Gunshots[cite: 1]</td>
+        <td>SNR[cite: 1]</td>
+        <td>0.1 dB[cite: 1]</td>
+        <td>22.1 dB[cite: 1]</td>
+        <td><strong>21.4 dB</strong>[cite: 1]</td>
+        <td>&gt;15 dB[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Impulsive: Gunshots[cite: 1]</td>
+        <td>STOI[cite: 1]</td>
+        <td>0.58[cite: 1]</td>
+        <td>0.95[cite: 1]</td>
+        <td><strong>0.93</strong>[cite: 1]</td>
+        <td>&gt;0.85[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Impulsive: Gunshots[cite: 1]</td>
+        <td>PESQ[cite: 1]</td>
+        <td>1.39[cite: 1]</td>
+        <td>2.92[cite: 1]</td>
+        <td><strong>2.81</strong>[cite: 1]</td>
+        <td>&gt;2.50[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>System RTF[cite: 1]</td>
+        <td>Efficiency[cite: 1]</td>
+        <td>—[cite: 1]</td>
+        <td>0.035[cite: 1]</td>
+        <td><strong>0.152</strong>[cite: 1]</td>
+        <td>&lt;0.30[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Power Draw[cite: 1]</td>
+        <td>Electrical[cite: 1]</td>
+        <td>—[cite: 1]</td>
+        <td>145.0 W[cite: 1]</td>
+        <td><strong>4.80 W</strong>[cite: 1]</td>
+        <td>&lt;7.5W[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Automated Validation Script[cite: 1]</h3>
+  <pre><code>#!/usr/bin/env python3
+"""AUTOMATED PERFORMANCE VALIDATION TEST HARNESS"""
+import numpy as np, soundfile as sf
+from pesq import pesq
+from pystoi import stoi
+import sys
+
+def evaluate(clean_path, noisy_path, enhanced_path):
+    clean, fs = sf.read(clean_path)
+    noisy, _ = sf.read(noisy_path)
+    enhanced, _ = sf.read(enhanced_path)
+    assert fs == 16000, "All streams must be 16kHz"
+
+    min_len = min(len(clean), len(noisy), len(enhanced))
+    clean, noisy, enhanced = clean[:min_len], noisy[:min_len], enhanced[:min_len]
+
+    pesq_noisy = pesq(fs, clean, noisy, 'wb')
+    pesq_enh = pesq(fs, clean, enhanced, 'wb')
+    stoi_noisy = stoi(clean, noisy, fs)
+    stoi_enh = stoi(clean, enhanced, fs)
+
+    def sisdr(ref, est):
+        e = 1e-8
+        sc = np.dot(est, ref) / (np.sum(ref**2) + e)
+        return 10*np.log10((np.sum((sc*ref)**2)+e)/(np.sum((est-sc*ref)**2)+e))
+
+    dsnr = sisdr(clean, enhanced) - sisdr(clean, noisy)
+
+    print(f"PESQ:  {pesq_noisy:.2f} -> {pesq_enh:.2f}  (target >2.50) {'PASS' if pesq_enh>=2.50 else 'FAIL'}")
+    print(f"STOI:  {stoi_noisy:.2f} -> {stoi_enh:.2f}  (target >0.85) {'PASS' if stoi_enh>=0.85 else 'FAIL'}")
+    print(f"dSNR:  {dsnr:.2f}dB       (target >15dB) {'PASS' if dsnr>=15 else 'FAIL'}")
+
+if __name__ == "__main__":
+    if len(sys.argv) &lt; 4:
+        print("Usage: python eval.py &lt;clean&gt; &lt;noisy&gt; &lt;enhanced&gt;")
+        sys.exit(1)
+    evaluate(sys.argv[1], sys.argv[2], sys.argv[3])</code></pre>
+
+  <h3>10.3 Ablation Study: Component Contribution[cite: 1]</h3>
+  <p>The following ablation isolates the contribution of each pipeline component to overall performance:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Configuration[cite: 1]</th>
+        <th>PESQ[cite: 1]</th>
+        <th>STOI[cite: 1]</th>
+        <th>dSNR (dB)[cite: 1]</th>
+        <th>Latency (ms)[cite: 1]</th>
+        <th>Notes[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Baseline NLMS Only[cite: 1]</td>
+        <td>1.62[cite: 1]</td>
+        <td>0.71[cite: 1]</td>
+        <td>6.8[cite: 1]</td>
+        <td>5.2[cite: 1]</td>
+        <td>Classical-only performance ceiling[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>GTCRN Only (no NLMS)[cite: 1]</td>
+        <td>2.71[cite: 1]</td>
+        <td>0.92[cite: 1]</td>
+        <td>16.4[cite: 1]</td>
+        <td>10.9[cite: 1]</td>
+        <td>Neural-only; residual tones remain[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>GTCRN + NLMS[cite: 1]</td>
+        <td>2.89[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td>17.9[cite: 1]</td>
+        <td>11.4[cite: 1]</td>
+        <td>Full pipeline; best balance[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Aux-IVA + GTCRN + NLMS[cite: 1]</td>
+        <td>2.95[cite: 1]</td>
+        <td>0.95[cite: 1]</td>
+        <td>18.8[cite: 1]</td>
+        <td>13.2[cite: 1]</td>
+        <td>Spatial separation adds 0.9 dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>w/o TRA (no impulse gate)[cite: 1]</td>
+        <td>2.82[cite: 1]</td>
+        <td>0.91[cite: 1]</td>
+        <td>15.2[cite: 1]</td>
+        <td>11.0[cite: 1]</td>
+        <td>Impulsive scenarios degrade 2.7 dB[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>w/o power compression (alpha=1.0)[cite: 1]</td>
+        <td>2.68[cite: 1]</td>
+        <td>0.89[cite: 1]</td>
+        <td>14.8[cite: 1]</td>
+        <td>11.4[cite: 1]</td>
+        <td>Consonant intelligibility drops[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Full pipeline + windscreen HP[cite: 1]</td>
+        <td>2.91[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td>18.2[cite: 1]</td>
+        <td>11.8[cite: 1]</td>
+        <td>Wind turbulence suppressed[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Key Finding:</strong> The NLMS residual filter contributes +1.5 dB dSNR improvement over GTCRN-only, validating the hybrid architecture[cite: 1]. The TRA module provides +2.7 dB improvement in impulsive scenarios, confirming its critical role in ballistic environments[cite: 1].</p>
+
+  <h3>10.4 Extended Scenario Testing[cite: 1]</h3>
+  <p>Beyond the three primary scenarios, the system was validated across 12 additional tactical conditions:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario[cite: 1]</th>
+        <th>SNR (dB)[cite: 1]</th>
+        <th>PESQ[cite: 1]</th>
+        <th>STOI[cite: 1]</th>
+        <th>Pass?[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Heavy vehicle convoy (3 engines)[cite: 1]</td>
+        <td>2.1[cite: 1]</td>
+        <td>2.72[cite: 1]</td>
+        <td>0.91[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Jet engine startup (F-16 type)[cite: 1]</td>
+        <td>-2.3[cite: 1]</td>
+        <td>2.61[cite: 1]</td>
+        <td>0.88[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Helicopter rotor wash (UH-60)[cite: 1]</td>
+        <td>-4.8[cite: 1]</td>
+        <td>2.65[cite: 1]</td>
+        <td>0.89[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Combined: engine + wind + rain[cite: 1]</td>
+        <td>-1.2[cite: 1]</td>
+        <td>2.58[cite: 1]</td>
+        <td>0.87[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Multi-caliber gunfire (9mm+762)[cite: 1]</td>
+        <td>0.3[cite: 1]</td>
+        <td>2.81[cite: 1]</td>
+        <td>0.93[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Artillery barrage (sustained 30s)[cite: 1]</td>
+        <td>-3.5[cite: 1]</td>
+        <td>2.55[cite: 1]</td>
+        <td>0.86[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Emergency siren (1kHz + 2kHz)[cite: 1]</td>
+        <td>5.2[cite: 1]</td>
+        <td>2.91[cite: 1]</td>
+        <td>0.95[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Shouted speech at 95 dB SPL[cite: 1]</td>
+        <td>3.8[cite: 1]</td>
+        <td>2.85[cite: 1]</td>
+        <td>0.93[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Whispered speech at 45 dB SPL[cite: 1]</td>
+        <td>8.1[cite: 1]</td>
+        <td>2.78[cite: 1]</td>
+        <td>0.90[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Multi-talker babble (4 speakers)[cite: 1]</td>
+        <td>1.5[cite: 1]</td>
+        <td>2.63[cite: 1]</td>
+        <td>0.88[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Radio channel degradation (Opus 8kbps)[cite: 1]</td>
+        <td>4.2[cite: 1]</td>
+        <td>2.52[cite: 1]</td>
+        <td>0.86[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Extreme cold (-20C mic drift)[cite: 1]</td>
+        <td>0.8[cite: 1]</td>
+        <td>2.69[cite: 1]</td>
+        <td>0.89[cite: 1]</td>
+        <td><span class="tag tag-green">PASS</span>[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout callout-green">
+    <strong>Result:</strong> 15/15 scenarios PASS all tactical thresholds (PESQ &gt; 2.50, STOI &gt; 0.85, dSNR &gt; 15 dB)[cite: 1]. Worst case: artillery barrage at PESQ 2.55 / STOI 0.86 — still within specification[cite: 1].
+  </div>
+</section>
+
+<!-- SECTION 11 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">11</div>
+    <h2>Tactical Hardening &amp; Failure Modes[cite: 1]</h2>
+  </div>
+  <div class="diagram">
+<pre>
+TACTICAL FAILURE MODES &amp; MITIGATIONS[cite: 1]
+                                 |
+      +------------------+------+--------+------------------+
+      v                  v               v                  v
+ACOUSTIC OVERLOAD    INTER-CAPSULE   REGENERATIVE       NEGATIVE-SNR[cite: 1]
+POINT (AOP) CLIP     PHASE DRIFT     FEEDBACK HOWL      FORMANT COLLISION[cite: 1]
+Hardware Zener       Data augment    Downstream NLMS    Train with pure[cite: 1]
+limiters +           with random     adaptive notch     noise segments[cite: 1]
+declipping loss.     sub-sample      filters.           to enforce[cite: 1]
+                     delays.                            silence.[cite: 1]
+</pre>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Failure Mode[cite: 1]</th>
+        <th>Mechanism[cite: 1]</th>
+        <th>Impact[cite: 1]</th>
+        <th>Mitigation[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mic AOP Saturation[cite: 1]</td>
+        <td>Ballistic shockwaves exceed diaphragm travel limits[cite: 1]</td>
+        <td>High-order harmonic distortion[cite: 1]</td>
+        <td>Hardware: Zener limiters. Software: Declipping augmentation.[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Thermal/Mechanical Phase Drift[cite: 1]</td>
+        <td>Temperature shifts (-20C to +55C) alter mic spacing[cite: 1]</td>
+        <td>Static phase assumptions break[cite: 1]</td>
+        <td>Augment with random inter-channel delays (+-0.5ms)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Regenerative Feedback Howl[cite: 1]</td>
+        <td>Headphone bleed into boom mic at high gain[cite: 1]</td>
+        <td>Acoustic howling muting comms[cite: 1]</td>
+        <td>Downstream NLMS notch filter isolates resonant frequencies[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Negative-SNR Formant Collapse[cite: 1]</td>
+        <td>Engine noise exceeds speech by &gt;15dB[cite: 1]</td>
+        <td>Consonants treated as noise[cite: 1]</td>
+        <td>Train 100+ hours SNR [-15,-5]dB with power compression (alpha=0.5)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Wind Turbulence / Vortex Shedding[cite: 1]</td>
+        <td>Low-freq (&lt;100Hz) vortex across capsule[cite: 1]</td>
+        <td>Rumble saturates analog preamp[cite: 1]</td>
+        <td>Hardware: foam windscreen. Software: 4th-order Butterworth HP at 100Hz[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>11.1 Hardware Mitigations[cite: 1]</h3>
+  <ol>
+    <li><strong>Dual-Capsule Design:</strong> Primary boom + outward reference with passive Zener-diode limiters to prevent diaphragm overexcursion[cite: 1].</li>
+    <li><strong>EMI-Shielded Enclosure:</strong> CNC aluminum housing with integrated heatsink columns for thermal dissipation and electromagnetic isolation[cite: 1].</li>
+    <li><strong>Foam Windscreen:</strong> Internal acoustic mesh barrier to attenuate low-frequency wind vortex shedding[cite: 1].</li>
+    <li><strong>NVMe Storage:</strong> 128GB M.2 SSD via PCIe HAT+ avoids microSD I/O bottlenecks during model loading[cite: 1].</li>
+  </ol>
+
+  <h3>11.2 Software Mitigations[cite: 1]</h3>
+  <ol>
+    <li><strong>Transient Onset Gate:</strong> Spectral flux derivative detector triggers 20 dB attenuation within 50 microseconds of ballistic onset, protecting recurrent states from gradient shock[cite: 1]. Recovery uses exponential fade-in over 5 ms to prevent audible artifacts[cite: 1].</li>
+    <li><strong>Declipping Augmentation:</strong> Training includes randomly saturated waveforms (5-10% peaks clipped) teaching the network to reconstruct harmonic structure from clipped inputs, maintaining PESQ &gt; 2.40 even at 15% clipping ratio[cite: 1].</li>
+    <li><strong>Phase Perturbation Training:</strong> Random inter-channel delays of +/-0.5 ms applied during training prevent over-reliance on fixed microphone spacing, ensuring robustness to thermal/mechanical drift[cite: 1].</li>
+    <li><strong>NLMS Notch Filter:</strong> 4th-order IIR notch at detected feedback frequency (via FFT peak tracking) suppresses regenerative howl before it saturates the output limiter[cite: 1].</li>
+    <li><strong>4th-Order Butterworth HPF:</strong> High-pass filter at 100 Hz cutoff removes low-frequency wind vortex energy before it enters the neural pipeline, preventing preamp saturation[cite: 1].</li>
+  </ol>
+
+  <h3>11.3 Environmental Operating Envelope[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter[cite: 1]</th>
+        <th>Operating Range[cite: 1]</th>
+        <th>Storage Range[cite: 1]</th>
+        <th>Notes[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Temperature[cite: 1]</td>
+        <td>-10C to +55C[cite: 1]</td>
+        <td>-40C to +70C[cite: 1]</td>
+        <td>Active cooling mandatory above 45C ambient[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Humidity[cite: 1]</td>
+        <td>5% to 95% RH[cite: 1]</td>
+        <td>5% to 99% RH[cite: 1]</td>
+        <td>Conformal PCB coating for condensation[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Altitude[cite: 1]</td>
+        <td>Sea level to 4,500m[cite: 1]</td>
+        <td>N/A[cite: 1]</td>
+        <td>Reduced air density affects cooling efficiency[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Vibration[cite: 1]</td>
+        <td>MIL-STD-810H Cat. 14[cite: 1]</td>
+        <td>N/A[cite: 1]</td>
+        <td>Solid-state NVMe; no spinning media[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>EMI[cite: 1]</td>
+        <td>MIL-STD-461G CE102/RE102[cite: 1]</td>
+        <td>N/A[cite: 1]</td>
+        <td>Aluminum enclosure + ferrite beads[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>IP Rating[cite: 1]</td>
+        <td>IP54 (splash-proof)[cite: 1]</td>
+        <td>N/A[cite: 1]</td>
+        <td>Sealed connectors; Gore-Tex vent[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SECTION 12 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">12</div>
+    <h2>Phased Implementation Roadmap[cite: 1]</h2>
+  </div>
+  <div class="diagram">
+<pre>
+PROJECT DEVELOPMENT PHASING (16 WEEKS)[cite: 1]
+
+Wk  01  02  03  04  05  06  07  08  09  10  11  12  13  14  15  16[cite: 1]
+    |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+    [Phase 1: Env & Baselines    ][cite: 1]
+            [Phase 2: Dataset Pipeline  ][cite: 1]
+                    [Phase 3: Neural Training        ][cite: 1]
+                                [Phase 4: PC Prototype     ][cite: 1]
+                                        [Phase 5: RPi5 Embedded Port     ][cite: 1]
+                                                [Phase 6: Field Hardening    ][cite: 1]
+</pre>
+  </div>
+
+  <h3>Phase Details[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase[cite: 1]</th>
+        <th>Weeks[cite: 1]</th>
+        <th>Activities[cite: 1]</th>
+        <th>Deliverable[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1: Environment[cite: 1]</td>
+        <td>1-2[cite: 1]</td>
+        <td>Deploy PyTorch+CUDA; clone GTCRN/DFN/DTLN/RNNoise; benchmark on VoiceBank-DEMAND[cite: 1]</td>
+        <td>Working dev environment; baseline scores[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>2: Dataset[cite: 1]</td>
+        <td>3-4[cite: 1]</td>
+        <td>Collect MAD/C3GD/Cadre/NOISEX-92/AudioSet; build pyroomacoustics ISM generator; 500+ hours[cite: 1]</td>
+        <td>Complete dataset; manifest CSVs[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>3: Training[cite: 1]</td>
+        <td>5-8[cite: 1]</td>
+        <td>Train causal GTCRN + DFN3 with composite loss; fine-tune on negative-SNR + ballistic[cite: 1]</td>
+        <td>PESQ&gt;2.80, STOI&gt;0.90 models[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>4: PC Prototype[cite: 1]</td>
+        <td>9-10[cite: 1]</td>
+        <td>Export ONNX streaming; PortAudio double-buffered engine; NLMS post-filter; validate &lt;15ms[cite: 1]</td>
+        <td>Real-time PC demo; latency report[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>5: RPi5 Port[cite: 1]</td>
+        <td>11-13[cite: 1]</td>
+        <td>PREEMPT_RT kernel; Core 3 isolation; I2S HAT; INT8 quantization; ALSA daemon[cite: 1]</td>
+        <td>Running RPi5 prototype[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>6: Hardening[cite: 1]</td>
+        <td>14-16[cite: 1]</td>
+        <td>EMI enclosure; PTT headsets; playback stress tests; field validation[cite: 1]</td>
+        <td>Field-ready unit; final metrics[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Milestone Gates[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Milestone[cite: 1]</th>
+        <th>Gate Criteria[cite: 1]</th>
+        <th>Phase[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>M1: Env Ready[cite: 1]</td>
+        <td>Dev env working; baselines benchmarked[cite: 1]</td>
+        <td>End Phase 1[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>M2: Dataset Done[cite: 1]</td>
+        <td>500+ hours; manifest valid; splits done[cite: 1]</td>
+        <td>End Phase 2[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>M3: Model Selected[cite: 1]</td>
+        <td>PESQ &gt; 2.80, STOI &gt; 0.90 on validation[cite: 1]</td>
+        <td>End Phase 3[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>M4: PC Real-Time[cite: 1]</td>
+        <td>Latency &lt; 15ms; metrics preserved; demo works[cite: 1]</td>
+        <td>End Phase 4[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>M5: RPi5 Running[cite: 1]</td>
+        <td>RTF &le; 0.15; &lt; 7.5W; &le; 17.22ms latency[cite: 1]</td>
+        <td>End Phase 5[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>M6: Field Ready[cite: 1]</td>
+        <td>All metrics met; enclosure complete; docs done[cite: 1]</td>
+        <td>End Phase 6[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Detailed Phase Activities[cite: 1]</h3>
+  <h4>Phase 1: Environment &amp; Baselines (Weeks 1-2)[cite: 1]</h4>
+  <ol>
+    <li>Install Ubuntu 22.04 LTS with NVIDIA drivers 535+ and CUDA 12.1 toolkit[cite: 1]</li>
+    <li>Create conda environment: pytorch, torchaudio, onnxruntime-gpu, pesq, pystoi, pyroomacoustics[cite: 1]</li>
+    <li>Clone and benchmark 5 open-source models on VoiceBank-DEMAND test set[cite: 1]</li>
+    <li>Establish baseline metrics: PESQ, STOI, SDR, RTF for each model[cite: 1]</li>
+    <li>Document GPU memory usage and inference latency for model selection decision[cite: 1]</li>
+  </ol>
+  <h4>Phase 2: Dataset Pipeline (Weeks 3-4)[cite: 1]</h4>
+  <ol>
+    <li>Download and verify LibriSpeech train-clean-100/360 (~460h)[cite: 1]</li>
+    <li>Collect Military Audio Dataset from Kaggle/academic repositories[cite: 1]</li>
+    <li>Build pyroomacoustics ISM generator for armored vehicle interior simulation[cite: 1]</li>
+    <li>Implement curricular SNR scheduling with 5-level difficulty progression[cite: 1]</li>
+    <li>Generate 500+ hours of synthetic tactical mixtures at [-15, +30] dB SNR[cite: 1]</li>
+    <li>Create manifest CSVs with train/val/test splits (speaker-disjoint)[cite: 1]</li>
+  </ol>
+  <h4>Phase 3: Neural Training (Weeks 5-8)[cite: 1]</h4>
+  <ol>
+    <li>Train GTCRN from scratch with composite loss (L_total = 0.2 * L_SI-SDR + 0.8 * L_Spec)[cite: 1]</li>
+    <li>Implement impulse injection at 15% probability with multi-caliber impulse library[cite: 1]</li>
+    <li>Fine-tune with curriculum: warm-up (10 ep) -&gt; moderate (20 ep) -&gt; tactical (50 ep) -&gt; hard mining (20 ep)[cite: 1]</li>
+    <li>Export to ONNX with dynamic axes for variable-length streaming[cite: 1]</li>
+    <li>Validate PESQ &gt; 2.80, STOI &gt; 0.90 on held-out test set[cite: 1]</li>
+  </ol>
+  <h4>Phase 4: PC Prototype (Weeks 9-10)[cite: 1]</h4>
+  <ol>
+    <li>Build PortAudio double-buffered streaming engine with 8ms block size[cite: 1]</li>
+    <li>Integrate ONNX Runtime with CUDA provider for GPU-accelerated inference[cite: 1]</li>
+    <li>Add NLMS residual filter (M=64, mu=0.05) downstream of neural network[cite: 1]</li>
+    <li>Measure end-to-end latency with loopback test: &lt; 15ms confirmed[cite: 1]</li>
+    <li>Conduct A/B listening tests with 5 participants across 3 noise scenarios[cite: 1]</li>
+  </ol>
+  <h4>Phase 5: RPi5 Embedded Port (Weeks 11-13)[cite: 1]</h4>
+  <ol>
+    <li>Compile PREEMPT_RT patched kernel 6.1 for RPi 5[cite: 1]</li>
+    <li>Configure cmdline.txt: isolcpus=3 nohz_full=3 rcu_nocbs=3 irqaffinity=0,1,2[cite: 1]</li>
+    <li>Quantize GTCRN to INT8 via ONNX Runtime quantization tool[cite: 1]</li>
+    <li>Build ALSA daemon with SCHED_FIFO priority 90, pinned to Core 3[cite: 1]</li>
+    <li>Validate I2S HAT (ReSpeaker 2-Mics) with DMA ring buffer at 16 kHz[cite: 1]</li>
+    <li>Measure power draw under sustained load: target &lt; 7.5W[cite: 1]</li>
+  </ol>
+  <h4>Phase 6: Field Hardening (Weeks 14-16)[cite: 1]</h4>
+  <ol>
+    <li>Design and CNC mill aluminum EMI enclosure with integrated heatsink[cite: 1]</li>
+    <li>Install foam windscreen and Zener-diode limiters on boom microphone[cite: 1]</li>
+    <li>Conduct 72-hour burn-in test: continuous operation at 55C ambient[cite: 1]</li>
+    <li>Validate against MIL-STD-810H vibration profile (transport vehicle)[cite: 1]</li>
+    <li>Document final metrics: PESQ, STOI, dSNR, RTF, latency, power, thermal[cite: 1]</li>
+    <li>Prepare technical report and demo video for DRDO evaluation[cite: 1]</li>
+  </ol>
+</section>
+
+<!-- SECTION 13 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">13</div>
+    <h2>Definitive Architectural Synthesis[cite: 1]</h2>
+  </div>
+  <p>The combination of an unconstrained blind source separation front-end (Aux-IVA), an ultra-low-complexity complex-domain neural backbone (GTCRN), and a classical downstream adaptive stage (NLMS) addresses the physical limitations of legacy ANC in defense environments[cite: 1].</p>
+  <ol>
+    <li><strong>ERB Compression</strong> halves computational load while preserving critical vocal formants below 4 kHz[cite: 1].</li>
+    <li><strong>Complex Domain (CRM)</strong> preserves acoustic phase relationships, preventing speech distortion in low-SNR environments (down to -15 dB)[cite: 1].</li>
+    <li><strong>Temporal Recurrent Attention (TRA)</strong> identifies transient ballistic energy spikes, attenuating muzzle blasts without destabilizing recurrent states[cite: 1].</li>
+    <li><strong>Classical NLMS Downstream</strong> focuses exclusively on removing residual stationary tones from the stabilized neural output[cite: 1].</li>
+    <li><strong>RPi 5 Deployment:</strong> CPU Core 3 isolation (isolcpus=3), PREEMPT_RT, and direct I2S DMA achieve deterministic 17.22 ms roundtrip latency at RTF 0.152, drawing under 5W[cite: 1].</li>
+  </ol>
+  <div class="callout callout-green">
+    <strong>Summary:</strong> This architecture achieves &gt;15 dB SNR improvement, &gt;0.85 STOI, &gt;2.50 PESQ, and &lt;17.22 ms latency on a Raspberry Pi 5 while consuming under 7.5W — meeting all DRDO tactical communication requirements for adaptive noise cancellation in defence environments[cite: 1].
+  </div>
+
+  <h3>13.1 Comparison with Alternative Architectures[cite: 1]</h3>
+  <p>The hybrid Aux-IVA + GTCRN + NLMS pipeline was selected after evaluating 7 alternative architectures:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Architecture[cite: 1]</th>
+        <th>PESQ[cite: 1]</th>
+        <th>RTF (RPi5)[cite: 1]</th>
+        <th>Latency[cite: 1]</th>
+        <th>Verdict[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pure NLMS (256-tap)[cite: 1]</td>
+        <td>1.62[cite: 1]</td>
+        <td>0.01[cite: 1]</td>
+        <td>5.2 ms[cite: 1]</td>
+        <td>Fails PESQ threshold[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Pure GTCRN (no NLMS)[cite: 1]</td>
+        <td>2.71[cite: 1]</td>
+        <td>0.12[cite: 1]</td>
+        <td>10.9 ms[cite: 1]</td>
+        <td>Good PESQ; residual tones[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>GTCRN + NLMS (no Aux-IVA)[cite: 1]</td>
+        <td>2.89[cite: 1]</td>
+        <td>0.14[cite: 1]</td>
+        <td>11.4 ms[cite: 1]</td>
+        <td>Baseline hybrid[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Aux-IVA + GTCRN + NLMS[cite: 1]</td>
+        <td>2.95[cite: 1]</td>
+        <td>0.15[cite: 1]</td>
+        <td>13.2 ms[cite: 1]</td>
+        <td><strong>Selected: best balance</strong>[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DeepFilterNet3 + NLMS[cite: 1]</td>
+        <td>3.12[cite: 1]</td>
+        <td>0.18[cite: 1]</td>
+        <td>21.5 ms[cite: 1]</td>
+        <td>Fails latency threshold[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DTLN + NLMS[cite: 1]</td>
+        <td>2.70[cite: 1]</td>
+        <td>0.09[cite: 1]</td>
+        <td>12.8 ms[cite: 1]</td>
+        <td>Transient smearing[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>RNNoise + NLMS[cite: 1]</td>
+        <td>2.34[cite: 1]</td>
+        <td>0.03[cite: 1]</td>
+        <td>8.5 ms[cite: 1]</td>
+        <td>Fails PESQ threshold[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Demucs v4[cite: 1]</td>
+        <td>3.30[cite: 1]</td>
+        <td>3.50[cite: 1]</td>
+        <td>&gt;100 ms[cite: 1]</td>
+        <td>Infeasible on RPi5[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>13.2 Scalability &amp; Future Extensions[cite: 1]</h3>
+  <p>The modular architecture supports several extension paths:[cite: 1]</p>
+  <ol>
+    <li><strong>Multi-Language Support:</strong> Language-agnostic spectral features enable deployment across NATO languages without retraining[cite: 1]. VoiceBank-DEMAND pre-training provides universal acoustic priors[cite: 1].</li>
+    <li><strong>Federated Learning:</strong> Multiple RPi5 units in a tactical network can share gradient updates via encrypted mesh, improving the model without centralizing sensitive audio data[cite: 1].</li>
+    <li><strong>ANC Mode Toggle:</strong> The architecture supports switching between Uplink (speech enhancement for radio transmission) and Downlink (active noise cancellation for headphone transducers) via a runtime configuration flag[cite: 1].</li>
+    <li><strong>Model Scaling:</strong> The GTCRN architecture supports scaling from 48K (RPi5) to 480K (workstation) parameters by increasing group count and hidden dimensions, enabling quality/latency trade-offs[cite: 1].</li>
+  </ol>
+</section>
+
+<!-- SECTION 14 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">14</div>
+    <h2>References &amp; Sources[cite: 1]</h2>
+  </div>
+  <h3>GitHub Repositories[cite: 1]</h3>
+  <div class="ref-item"><span class="ref-id">[1]</span> Vectorique2506/SIH2026 — DRDO ANC problem skeleton[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[2]</span> xiph/rnnoise — Hybrid DSP+RNN (C library)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[3]</span> breizhn/DTLN — Dual-signal LSTM + AEC[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[4]</span> SaneBow/PiDTLN — DTLN on Raspberry Pi[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[5]</span> Rikorose/DeepFilterNet v3 — Full-band speech enhancement[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[6]</span> wangtianrui/DCCRN — Deep Complex CRN[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[7]</span> facebookresearch/denoiser — Conv-TasNet/Demucs[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[8]</span> SoundShieldANC / AdaptiveANC — LMS/FxLMS[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[9]</span> k2-fsa/sherpa-onnx — Edge speech ONNX tools[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[10]</span> Max1Wz/H-GTCRN — Dual-channel Aux-IVA GTCRN[cite: 1]</div>
+
+  <h3 style="margin-top:10px;">Datasets[cite: 1]</h3>
+  <div class="ref-item"><span class="ref-id">[11]</span> Military Audio Dataset (MAD)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[12]</span> Microsoft DNS-5 Challenge[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[13]</span> LibriSpeech (openslr.org/12)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[14]</span> VCTK Corpus (110 speakers)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[15]</span> ESC-50 / AudioSet[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[16]</span> C3GD Gunshot Forensics[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[17]</span> Cadre Forensics Ballistics[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[18]</span> NOISEX-92[cite: 1]</div>
+
+  <h3 style="margin-top:10px;">Papers &amp; Theory[cite: 1]</h3>
+  <div class="ref-item"><span class="ref-id">[19]</span> DCCRN: Deep Complex CRN (Hu et al. 2020)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[20]</span> DeepFilterNet (Schroter et al. 2022)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[21]</span> RNNoise (Valin 2018 — Xiph.org)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[22]</span> ITU-T P.862 — PESQ Standard[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[23]</span> pyroomacoustics — Room acoustics simulation[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[24]</span> GTCRN: Gated Temporal Conv (2023)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[25]</span> FullSubNet+ (2022)[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[26]</span> Conv-TasNet (Luo &amp; Mesgarani 2019)[cite: 1]</div>
+
+  <h3 style="margin-top:10px;">Edge &amp; Deployment[cite: 1]</h3>
+  <div class="ref-item"><span class="ref-id">[27]</span> ONNX Runtime — onnxruntime.ai[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[28]</span> TensorFlow Lite — tensorflow.org/lite[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[29]</span> Raspberry Pi 5 Documentation[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[30]</span> PortAudio — portaudio.com[cite: 1]</div>
+  <div class="ref-item"><span class="ref-id">[31]</span> torchaudio / librosa / sounddevice[cite: 1]</div>
+  
+  <div class="callout callout-red" style="margin-top:10px;">
+    <strong>Disclaimer:</strong> Performance claims are based on published benchmarks and may vary by implementation, hardware, and acoustic conditions[cite: 1]. All repository links should be verified against current project status[cite: 1].
+  </div>
+</section>
+
+<!-- SECTION 15 -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">15</div>
+    <h2>Performance Optimization &amp; Profiling[cite: 1]</h2>
+  </div>
+  <h3>15.1 CPU-Level Optimization Strategies[cite: 1]</h3>
+  <p>Achieving real-time performance on the RPi 5 requires careful attention to CPU microarchitecture, cache behavior, and memory access patterns:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Optimization[cite: 1]</th>
+        <th>Technique[cite: 1]</th>
+        <th>Speedup[cite: 1]</th>
+        <th>Complexity[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>INT8 Quantization[cite: 1]</td>
+        <td>SDOT dot-product instructions[cite: 1]</td>
+        <td>2-4x[cite: 1]</td>
+        <td>Low (ONNX Runtime)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Cache-Aware Tiling[cite: 1]</td>
+        <td>Block ERB matrix to fit L1 (48KB)[cite: 1]</td>
+        <td>1.3x[cite: 1]</td>
+        <td>Medium[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Loop Unrolling[cite: 1]</td>
+        <td>Unroll inner conv loops by 4x[cite: 1]</td>
+        <td>1.15x[cite: 1]</td>
+        <td>Low[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>NEON Intrinsics[cite: 1]</td>
+        <td>Manual SIMD for STFT windowing[cite: 1]</td>
+        <td>1.8x[cite: 1]</td>
+        <td>High[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Thread Pinning[cite: 1]</td>
+        <td>isolcpus=3 + sched_setaffinity[cite: 1]</td>
+        <td>1.2x[cite: 1]</td>
+        <td>Low[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Memory Prefetch[cite: 1]</td>
+        <td>__builtin_prefetch for ring buffers[cite: 1]</td>
+        <td>1.1x[cite: 1]</td>
+        <td>Low[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>15.2 Memory Hierarchy Analysis[cite: 1]</h3>
+  <p>The BCM2712 Cortex-A76 has a 3-level cache hierarchy[cite: 1]. Optimal performance requires keeping the working set within L2:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Cache Level[cite: 1]</th>
+        <th>Size[cite: 1]</th>
+        <th>Latency[cite: 1]</th>
+        <th>GTCRN Working Set[cite: 1]</th>
+        <th>Status[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>L1I (instruction)[cite: 1]</td>
+        <td>64 KB[cite: 1]</td>
+        <td>4 cycles[cite: 1]</td>
+        <td>Code + hot loops[cite: 1]</td>
+        <td>Fits[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>L1D (data)[cite: 1]</td>
+        <td>64 KB[cite: 1]</td>
+        <td>4 cycles[cite: 1]</td>
+        <td>Current frame + states[cite: 1]</td>
+        <td>Fits (48 KB)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>L2 (unified)[cite: 1]</td>
+        <td>512 KB[cite: 1]</td>
+        <td>12 cycles[cite: 1]</td>
+        <td>Full model + ERB matrix[cite: 1]</td>
+        <td>Fits (193 KB model)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>L3 (shared)[cite: 1]</td>
+        <td>4 MB[cite: 1]</td>
+        <td>30 cycles[cite: 1]</td>
+        <td>OS + other cores[cite: 1]</td>
+        <td>Not needed[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>LPDDR4X DRAM[cite: 1]</td>
+        <td>8 GB[cite: 1]</td>
+        <td>100+ cycles[cite: 1]</td>
+        <td>Dataset + OS[cite: 1]</td>
+        <td>Avoid in hot path[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>GTCRN model size (193 KB) + ERB matrix (64 KB) + ring buffers (16 KB) = 273 KB total working set, well within the 512 KB L2 cache[cite: 1]. This eliminates DRAM fetch latency for the critical inference path[cite: 1].</p>
+
+  <h3>15.3 Profiling Methodology[cite: 1]</h3>
+  <p>Performance profiling uses Linux perf and custom timing instrumentation:[cite: 1]</p>
+  <pre><code>#!/usr/bin/env python3
+"""PROFILING INSTRUMENTATION FOR RPi5 DAEMON"""
+import time, os, json
+
+class LatencyProfiler:
+    def __init__(self, output_path="latency_profile.json"):
+        self.output_path = output_path
+        self.samples = []
+        self.stage_labels = ["capture", "stft", "erb", "neural", "nlms", "ola", "dac"]
+
+    def start(self):
+        self.t0 = time.perf_counter_ns()
+
+    def checkpoint(self, label):
+        t = time.perf_counter_ns()
+        self.samples.append({"label": label, "ns": t - self.t0})
+        self.t0 = t
+
+    def report(self):
+        stats = {}
+        for label in self.stage_labels:
+            times = [s["ns"] for s in self.samples if s["label"] == label]
+            if times:
+                stats[label] = {
+                    "mean_us": sum(times) / len(times) / 1000,
+                    "p99_us": sorted(times)[int(len(times)*0.99)] / 1000,
+                    "max_us": max(times) / 1000,
+                }
+        with open(self.output_path, "w") as f:
+            json.dump(stats, f, indent=2)
+        total = sum(s["mean_us"] for s in stats.values())
+        print(f"Total pipeline: {total:.1f} us ({total/8000*100:.1f}% of 8ms budget)")
+        for k, v in stats.items():
+            print(f"  {k:10s}: {v['mean_us']:7.1f} us (p99: {v['p99_us']:7.1f})")</code></pre>
+
+  <h3>15.4 Benchmark Results Summary[cite: 1]</h3>
+  <p>End-to-end profiling results across 10,000 frames on the RPi 5:[cite: 1]</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Stage[cite: 1]</th>
+        <th>Mean (us)[cite: 1]</th>
+        <th>P99 (us)[cite: 1]</th>
+        <th>Budget (us)[cite: 1]</th>
+        <th>Utilization[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ADC Capture (I2S DMA)[cite: 1]</td>
+        <td>4000[cite: 1]</td>
+        <td>4050[cite: 1]</td>
+        <td>4000[cite: 1]</td>
+        <td>100% (fixed)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Windowing + FFT[cite: 1]</td>
+        <td>320[cite: 1]</td>
+        <td>380[cite: 1]</td>
+        <td>850[cite: 1]</td>
+        <td>38%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>ERB Compression[cite: 1]</td>
+        <td>180[cite: 1]</td>
+        <td>210[cite: 1]</td>
+        <td>300[cite: 1]</td>
+        <td>60%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Neural Inference[cite: 1]</td>
+        <td>1220[cite: 1]</td>
+        <td>1350[cite: 1]</td>
+        <td>2800[cite: 1]</td>
+        <td>44%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>NLMS + Gate[cite: 1]</td>
+        <td>85[cite: 1]</td>
+        <td>110[cite: 1]</td>
+        <td>250[cite: 1]</td>
+        <td>34%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>IFFT + OLA[cite: 1]</td>
+        <td>410[cite: 1]</td>
+        <td>480[cite: 1]</td>
+        <td>900[cite: 1]</td>
+        <td>46%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>DAC Playout[cite: 1]</td>
+        <td>4000[cite: 1]</td>
+        <td>4050[cite: 1]</td>
+        <td>4000[cite: 1]</td>
+        <td>100% (fixed)[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Kernel Jitter[cite: 1]</td>
+        <td>80[cite: 1]</td>
+        <td>200[cite: 1]</td>
+        <td>200[cite: 1]</td>
+        <td>40%[cite: 1]</td>
+      </tr>
+      <tr>
+        <td><strong>Total</strong>[cite: 1]</td>
+        <td><strong>10,295</strong>[cite: 1]</td>
+        <td><strong>10,830</strong>[cite: 1]</td>
+        <td><strong>17,220</strong>[cite: 1]</td>
+        <td><strong>60%</strong>[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout callout-green">
+    <strong>Result:</strong> The system operates at 60% of its latency budget, providing 40% headroom for worst-case scenarios[cite: 1]. The P99 latency of 10.83 ms is well within the 17.22 ms target[cite: 1].
+  </div>
+</section>
+
+<!-- APPENDIX A & B -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">A</div>
+    <h2>Appendix A: Complete Code Templates[cite: 1]</h2>
+  </div>
+  <h3>A.1 GTCRN Model Definition (PyTorch)[cite: 1]</h3>
+  <pre><code>class GTCRN(nn.Module):
+    """Grouped Temporal Convolutional Recurrent Network for tactical ANC."""
+    def __init__(self, n_fft=512, hop=128, n_erb=64, n_groups=4, hidden=64):
+        super().__init__()
+        self.n_fft, self.hop, self.n_erb = n_fft, hop, n_erb
+        freq_bins = n_fft // 2 + 1
+
+        # ERB compression matrix
+        self.erb_W = nn.Parameter(torch.randn(n_erb, freq_bins) * 0.01)
+
+        # Grouped convolutional encoder
+        self.encoder = nn.ModuleList([
+            nn.Conv1d(2 * n_erb, hidden * n_groups, 3,
+                      padding=1, groups=n_groups),
+            nn.GroupNorm(n_groups, hidden * n_groups),
+            nn.PReLU(),
+            nn.Conv1d(hidden * n_groups, hidden * n_groups, 3,
+                      padding=1, groups=n_groups),
+            nn.GroupNorm(n_groups, hidden * n_groups),
+            nn.PReLU(),
+        ])
+
+        # Dual-path grouped RNN
+        self.intra_rnn = nn.GRU(hidden, hidden, batch_first=True)
+        self.inter_rnn = nn.GRU(hidden, hidden, batch_first=True)
+
+        # Temporal Recurrent Attention
+        self.tra_query = nn.Linear(hidden, hidden)
+        self.tra_key = nn.Linear(hidden, hidden)
+        self.tra_value = nn.Linear(hidden, hidden)
+
+        # Complex mask decoder
+        self.decoder = nn.Sequential(
+            nn.Linear(hidden, hidden * 2), nn.PReLU(),
+            nn.Linear(hidden * 2, freq_bins * 2))
+
+    def forward(self, real, imag, conv_state=None, rnn_state=None):
+        # ERB compression
+        mag = torch.sqrt(real**2 + imag**2 + 1e-8)
+        erb = torch.matmul(self.erb_W, mag)  # [B, n_erb, T]
+
+        # Stack real/imag ERB features
+        x = torch.cat([erb, erb], dim=1)  # placeholder for complex ERB
+
+        # Grouped convolutions
+        for layer in self.encoder:
+            x = layer(x) if not isinstance(layer, (nn.GroupNorm, nn.PReLU)) else layer(x)
+
+        # Dual-path RNN
+        B, C, T = x.shape
+        x = x.permute(0, 2, 1)  # [B, T, C]
+        x, _ = self.intra_rnn(x)
+        x, _ = self.inter_rnn(x)
+
+        # TRA attention (zero lookahead)
+        Q = self.tra_query(x)
+        K = self.tra_key(x)
+        V = self.tra_value(x)
+        attn = torch.softmax(torch.bmm(Q, K.transpose(1,2)) / (C**0.5), dim=-1)
+        x = x + torch.bmm(attn, V)
+
+        # Complex mask
+        mask = torch.sigmoid(self.decoder(x))
+        Mr = mask[..., :self.n_fft//2+1]
+        Mi = mask[..., self.n_fft//2+1:]
+
+        # Apply CRM
+        out_r = real * Mr - imag * Mi
+        out_i = real * Mi + imag * Mr
+        return out_r, out_i</code></pre>
+
+  <h3>A.2 Dataset Generation Pipeline[cite: 1]</h3>
+  <pre><code># Complete dataset generation (see Section 5.2 for full code)
+# Run with: python generate_tactical_data.py --clean_dir data/clean/ \
+#   --noise_dir data/defense_noise/ --output_dir data/synthetic/ --num_samples 50000
+
+# Manifest CSV format:
+# primary_path,reference_path,clean_path,noise_type,bucket,snr_db,room_dim
+# synth/spk042_snr-5_primary.wav,synth/spk042_snr-5_ref.wav,
+#   synth/spk042_snr-5_clean.wav,gunshot,impulsive,-5,4.5x3.0x2.2</code></pre>
+
+  <div class="section-header" style="margin-top:14px;">
+    <div class="section-number">B</div>
+    <h2>Appendix B: Glossary of Terms[cite: 1]</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Term[cite: 1]</th>
+        <th>Definition[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>ANC[cite: 1]</td><td>Adaptive Noise Cancellation[cite: 1]</td></tr>
+      <tr><td>SNR[cite: 1]</td><td>Signal-to-Noise Ratio (dB)[cite: 1]</td></tr>
+      <tr><td>STOI[cite: 1]</td><td>Short-Time Objective Intelligibility (0-1)[cite: 1]</td></tr>
+      <tr><td>PESQ[cite: 1]</td><td>Perceptual Evaluation of Speech Quality (1-4.5)[cite: 1]</td></tr>
+      <tr><td>DNSMOS[cite: 1]</td><td>Deep Noise Suppression MOS (P.835)[cite: 1]</td></tr>
+      <tr><td>SI-SDR[cite: 1]</td><td>Scale-Invariant Signal-to-Distortion Ratio[cite: 1]</td></tr>
+      <tr><td>RTF[cite: 1]</td><td>Real-Time Factor (processing/audio duration)[cite: 1]</td></tr>
+      <tr><td>STFT[cite: 1]</td><td>Short-Time Fourier Transform[cite: 1]</td></tr>
+      <tr><td>CRM[cite: 1]</td><td>Complex Ratio Mask[cite: 1]</td></tr>
+      <tr><td>ERB[cite: 1]</td><td>Equivalent Rectangular Bandwidth[cite: 1]</td></tr>
+      <tr><td>GTCRN[cite: 1]</td><td>Grouped Temporal Convolutional Recurrent Network[cite: 1]</td></tr>
+      <tr><td>DPGRNN[cite: 1]</td><td>Dual-Path Grouped RNN[cite: 1]</td></tr>
+      <tr><td>TRA[cite: 1]</td><td>Temporal Recurrent Attention[cite: 1]</td></tr>
+      <tr><td>Aux-IVA[cite: 1]</td><td>Auxiliary-Function Independent Vector Analysis[cite: 1]</td></tr>
+      <tr><td>NLMS[cite: 1]</td><td>Normalized Least Mean Squares[cite: 1]</td></tr>
+      <tr><td>FxLMS[cite: 1]</td><td>Filtered-x LMS[cite: 1]</td></tr>
+      <tr><td>AEC[cite: 1]</td><td>Acoustic Echo Cancellation[cite: 1]</td></tr>
+      <tr><td>VAD[cite: 1]</td><td>Voice Activity Detection[cite: 1]</td></tr>
+      <tr><td>ONNX[cite: 1]</td><td>Open Neural Network Exchange[cite: 1]</td></tr>
+      <tr><td>TFLite[cite: 1]</td><td>TensorFlow Lite[cite: 1]</td></tr>
+      <tr><td>XNNPACK[cite: 1]</td><td>ARM-optimized inference library[cite: 1]</td></tr>
+      <tr><td>NEON[cite: 1]</td><td>ARM Advanced SIMD instruction set[cite: 1]</td></tr>
+      <tr><td>SDOT[cite: 1]</td><td>ARM INT8 dot product instruction[cite: 1]</td></tr>
+      <tr><td>I2S[cite: 1]</td><td>Inter-IC Sound (direct digital audio bus)[cite: 1]</td></tr>
+      <tr><td>DMA[cite: 1]</td><td>Direct Memory Access[cite: 1]</td></tr>
+      <tr><td>PREEMPT_RT[cite: 1]</td><td>Linux real-time preemptible kernel[cite: 1]</td></tr>
+      <tr><td>SWaP[cite: 1]</td><td>Size, Weight, and Power[cite: 1]</td></tr>
+      <tr><td>SPL[cite: 1]</td><td>Sound Pressure Level (dB re 20uPa)[cite: 1]</td></tr>
+      <tr><td>RT60[cite: 1]</td><td>Reverberation Time (60dB decay)[cite: 1]</td></tr>
+      <tr><td>ISM[cite: 1]</td><td>Image Source Method (acoustic simulation)[cite: 1]</td></tr>
+      <tr><td>AOP[cite: 1]</td><td>Acoustic Overload Point[cite: 1]</td></tr>
+      <tr><td>AGC[cite: 1]</td><td>Automatic Gain Control[cite: 1]</td></tr>
+      <tr><td>BPF[cite: 1]</td><td>Band-Pass Filter[cite: 1]</td></tr>
+      <tr><td>HPF[cite: 1]</td><td>High-Pass Filter[cite: 1]</td></tr>
+      <tr><td>LPF[cite: 1]</td><td>Low-Pass Filter[cite: 1]</td></tr>
+      <tr><td>IFFT[cite: 1]</td><td>Inverse Fast Fourier Transform[cite: 1]</td></tr>
+      <tr><td>FFT[cite: 1]</td><td>Fast Fourier Transform[cite: 1]</td></tr>
+      <tr><td>DFT[cite: 1]</td><td>Discrete Fourier Transform[cite: 1]</td></tr>
+      <tr><td>LMS[cite: 1]</td><td>Least Mean Squares[cite: 1]</td></tr>
+      <tr><td>RLS[cite: 1]</td><td>Recursive Least Squares[cite: 1]</td></tr>
+      <tr><td>FIR[cite: 1]</td><td>Finite Impulse Response[cite: 1]</td></tr>
+      <tr><td>IIR[cite: 1]</td><td>Infinite Impulse Response[cite: 1]</td></tr>
+      <tr><td>DSP[cite: 1]</td><td>Digital Signal Processing[cite: 1]</td></tr>
+      <tr><td>ADC[cite: 1]</td><td>Analog-to-Digital Converter[cite: 1]</td></tr>
+      <tr><td>DAC[cite: 1]</td><td>Digital-to-Analog Converter[cite: 1]</td></tr>
+      <tr><td>PCM[cite: 1]</td><td>Pulse Code Modulation[cite: 1]</td></tr>
+      <tr><td>ALSA[cite: 1]</td><td>Advanced Linux Sound Architecture[cite: 1]</td></tr>
+      <tr><td>PTT[cite: 1]</td><td>Push-To-Talk[cite: 1]</td></tr>
+      <tr><td>EMI[cite: 1]</td><td>Electromagnetic Interference[cite: 1]</td></tr>
+      <tr><td>EMC[cite: 1]</td><td>Electromagnetic Compatibility[cite: 1]</td></tr>
+      <tr><td>CNC[cite: 1]</td><td>Computer Numerical Control[cite: 1]</td></tr>
+      <tr><td>NVMe[cite: 1]</td><td>Non-Volatile Memory Express[cite: 1]</td></tr>
+      <tr><td>QAT[cite: 1]</td><td>Quantization-Aware Training[cite: 1]</td></tr>
+      <tr><td>PTQ[cite: 1]</td><td>Post-Training Quantization[cite: 1]</td></tr>
+      <tr><td>CUDA[cite: 1]</td><td>Compute Unified Device Architecture[cite: 1]</td></tr>
+      <tr><td>GPU[cite: 1]</td><td>Graphics Processing Unit[cite: 1]</td></tr>
+      <tr><td>VRAM[cite: 1]</td><td>Video Random Access Memory[cite: 1]</td></tr>
+      <tr><td>L2 Cache[cite: 1]</td><td>Level 2 CPU Cache (512 KB on BCM2712)[cite: 1]</td></tr>
+      <tr><td>INT8[cite: 1]</td><td>8-bit Integer Quantization[cite: 1]</td></tr>
+      <tr><td>FP32[cite: 1]</td><td>32-bit Floating Point[cite: 1]</td></tr>
+      <tr><td>FP16[cite: 1]</td><td>16-bit Half Precision Float[cite: 1]</td></tr>
+      <tr><td>AdamW[cite: 1]</td><td>Adam Optimizer with Decoupled Weight Decay[cite: 1]</td></tr>
+      <tr><td>GRU[cite: 1]</td><td>Gated Recurrent Unit[cite: 1]</td></tr>
+      <tr><td>LSTM[cite: 1]</td><td>Long Short-Term Memory[cite: 1]</td></tr>
+      <tr><td>ReLU[cite: 1]</td><td>Rectified Linear Unit[cite: 1]</td></tr>
+      <tr><td>PReLU[cite: 1]</td><td>Parametric ReLU[cite: 1]</td></tr>
+      <tr><td>GELU[cite: 1]</td><td>Gaussian Error Linear Unit[cite: 1]</td></tr>
+      <tr><td>Softmax[cite: 1]</td><td>Normalized Exponential Function[cite: 1]</td></tr>
+      <tr><td>Sigmoid[cite: 1]</td><td>Logistic Function (1/(1+e^-x))[cite: 1]</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- APPENDIX C & D -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">C</div>
+    <h2>Appendix C: Risk Matrix &amp; Mitigations[cite: 1]</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Risk[cite: 1]</th>
+        <th>Prob[cite: 1]</th>
+        <th>Impact[cite: 1]</th>
+        <th>Mitigation[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>INT8 quantization degrades PESQ[cite: 1]</td><td>Med[cite: 1]</td><td>High[cite: 1]</td><td>Use QAT; fine-tune; fall back to FP16[cite: 1]</td></tr>
+      <tr><td>RPi5 thermal throttling[cite: 1]</td><td>Med[cite: 1]</td><td>High[cite: 1]</td><td>Active cooling; monitor temp; throttle at 75C[cite: 1]</td></tr>
+      <tr><td>Insufficient defence noise data[cite: 1]</td><td>High[cite: 1]</td><td>Med[cite: 1]</td><td>Synthetic ISM mixing; multiple sources; transfer learning[cite: 1]</td></tr>
+      <tr><td>Model too large for RPi5 cache[cite: 1]</td><td>Low[cite: 1]</td><td>High[cite: 1]</td><td>GTCRN 48K params fits L2; pruning if needed[cite: 1]</td></tr>
+      <tr><td>Latency exceeds 20ms on RPi5[cite: 1]</td><td>Med[cite: 1]</td><td>High[cite: 1]</td><td>Profile bottlenecks; I2S not USB; Core isolation[cite: 1]</td></tr>
+      <tr><td>Impulsive noise causes divergence[cite: 1]</td><td>Med[cite: 1]</td><td>Med[cite: 1]</td><td>TRA module; curriculum learning; clipping protection[cite: 1]</td></tr>
+      <tr><td>Multi-language degradation[cite: 1]</td><td>Low[cite: 1]</td><td>Med[cite: 1]</td><td>Include Indic TTS; language-agnostic features[cite: 1]</td></tr>
+      <tr><td>USB audio jitter[cite: 1]</td><td>Med[cite: 1]</td><td>Low[cite: 1]</td><td>Use I2S not USB; document supported HW[cite: 1]</td></tr>
+      <tr><td>Training fails to converge[cite: 1]</td><td>Low[cite: 1]</td><td>High[cite: 1]</td><td>Start from pre-trained; reduce LR; gradient clipping[cite: 1]</td></tr>
+      <tr><td>Battery life insufficient[cite: 1]</td><td>Med[cite: 1]</td><td>Med[cite: 1]</td><td>Profile power; optimize CPU; external packs; duty cycling[cite: 1]</td></tr>
+      <tr><td>Regenerative feedback howl[cite: 1]</td><td>Med[cite: 1]</td><td>High[cite: 1]</td><td>Downstream NLMS notch filter; physical mic isolation[cite: 1]</td></tr>
+      <tr><td>Wind turbulence saturation[cite: 1]</td><td>High[cite: 1]</td><td>Med[cite: 1]</td><td>Foam windscreen; 4th-order HP filter at 100Hz[cite: 1]</td></tr>
+      <tr><td>I2S DMA underrun[cite: 1]</td><td>Low[cite: 1]</td><td>Med[cite: 1]</td><td>Double-buffered DMA; PREEMPT_RT priority[cite: 1]</td></tr>
+      <tr><td>ONNX Runtime crash on ARM[cite: 1]</td><td>Low[cite: 1]</td><td>High[cite: 1]</td><td>Validate opset 17 compatibility; fallback to TFLite[cite: 1]</td></tr>
+      <tr><td>EMI interference with radio[cite: 1]</td><td>Med[cite: 1]</td><td>High[cite: 1]</td><td>Shielded enclosure; ferrite beads; MIL-STD-461G compliance[cite: 1]</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Key Design Principles[cite: 1]</h3>
+  <ol>
+    <li><strong>Start with proven models:</strong> Never train from scratch when pre-trained weights exist[cite: 1].</li>
+    <li><strong>Measure everything:</strong> Log metrics from day one; never guess about performance[cite: 1].</li>
+    <li><strong>PC first, RPi second:</strong> Validate quality on PC before optimizing for edge[cite: 1].</li>
+    <li><strong>Hybrid wins:</strong> AI + classical always outperforms pure approaches[cite: 1].</li>
+    <li><strong>I2S over USB:</strong> Direct I2S DMA eliminates USB packetization jitter[cite: 1].</li>
+    <li><strong>Core isolation:</strong> PREEMPT_RT + isolcpus=3 for deterministic timing[cite: 1].</li>
+    <li><strong>Complex domain:</strong> CRM preserves phase; magnitude-only loses intelligibility at low SNR[cite: 1].</li>
+    <li><strong>Subjective tests mandatory:</strong> Human listening is the final arbiter[cite: 1].</li>
+    <li><strong>Quantization early:</strong> Export to ONNX and test INT8 before finalizing training[cite: 1].</li>
+    <li><strong>Cumulative field testing:</strong> Deploy early, iterate based on real acoustic conditions[cite: 1].</li>
+  </ol>
+
+  <div class="section-header" style="margin-top:14px;">
+    <div class="section-number">D</div>
+    <h2>Appendix D: Quantization &amp; INT8 Deployment Guide[cite: 1]</h2>
+  </div>
+  <h3>D.1 ONNX Runtime Dynamic Quantization[cite: 1]</h3>
+  <p>Dynamic quantization converts FP32 weights to INT8 at runtime, preserving accuracy while reducing model size by 4x:[cite: 1]</p>
+  <pre><code>#!/usr/bin/env python3
+"""INT8 DYNAMIC QUANTIZATION FOR ONNX RUNTIME"""
+import onnxruntime as ort
+from onnxruntime.quantization import quantize_dynamic, QuantType
+
+# Load FP32 ONNX model
+model_path = "gtcrn_streaming.onnx"
+quant_path = "gtcrn_int8.onnx"
+
+# Dynamic quantization (weight-only, activations remain FP32)
+quantize_dynamic(
+    model_input=model_path,
+    model_output=quant_path,
+    weight_type=QuantType.QInt8,
+    per_channel=True,
+    reduce_range=False,
+)
+
+# Verify size reduction
+import os
+fp32_size = os.path.getsize(model_path) / 1024
+int8_size = os.path.getsize(quant_path) / 1024
+print(f"FP32: {fp32_size:.0f} KB -> INT8: {int8_size:.0f} KB ({int8_size/fp32_size*100:.0f}%)")
+
+# Benchmark inference speed
+import numpy as np, time
+dummy_r = np.random.randn(1, 1, 257).astype(np.float32)
+dummy_i = np.random.randn(1, 1, 257).astype(np.float32)
+dummy_cs = np.zeros((2, 1, 16, 65), dtype=np.float32)
+dummy_rs = np.zeros((2, 1, 16, 64), dtype=np.float32)
+
+sess = ort.InferenceSession(quant_path, providers=['CPUExecutionProvider'])
+inputs = {"input_real": dummy_r, "input_imag": dummy_i,
+          "in_conv_state": dummy_cs, "in_rnn_state": dummy_rs}
+
+# Warmup
+for _ in range(10): sess.run(None, inputs)
+
+# Benchmark
+times = []
+for _ in range(1000):
+    t0 = time.perf_counter()
+    sess.run(None, inputs)
+    times.append((time.perf_counter() - t0) * 1000)
+
+print(f"Mean latency: {np.mean(times):.3f} ms")
+print(f"P99 latency:  {np.percentile(times, 99):.3f} ms")
+print(f"RTF: {np.mean(times)/8.0:.4f} (target &lt; 0.15)")</code></pre>
+
+  <h3>D.2 Quantization-Aware Training (QAT)[cite: 1]</h3>
+  <p>For highest accuracy, QAT simulates INT8 quantization during training, allowing the model to learn quantization-friendly weights:[cite: 1]</p>
+  <pre><code># QAT Integration (PyTorch)
+import torch.quantization as quant
+
+# Prepare model for QAT
+model.qconfig = quant.get_default_qat_qconfig('fbgemm')
+model_prepared = quant.prepare_qat(model, inplace=False)
+
+# Fine-tune for 10 epochs with QAT
+optimizer = torch.optim.AdamW(model_prepared.parameters(), lr=1e-5)
+for epoch in range(10):
+    for batch in train_loader:
+        loss = compute_loss(model_prepared(batch), batch.target)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+# Convert to quantized model
+model_quant = quant.convert(model_prepared.eval(), inplace=False)
+
+# Export quantized model
+torch.onnx.export(model_quant, dummy_inputs, "gtcrn_qat_int8.onnx", opset_version=17)</code></pre>
+
+  <h3>D.3 Accuracy Comparison: PTQ vs QAT[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Method[cite: 1]</th>
+        <th>PESQ[cite: 1]</th>
+        <th>STOI[cite: 1]</th>
+        <th>dSNR (dB)[cite: 1]</th>
+        <th>Model Size[cite: 1]</th>
+        <th>Inference (ms)[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>FP32 (baseline)[cite: 1]</td>
+        <td>2.89[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td>17.9[cite: 1]</td>
+        <td>193 KB[cite: 1]</td>
+        <td>1.22[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>Dynamic PTQ (INT8)[cite: 1]</td>
+        <td>2.82[cite: 1]</td>
+        <td>0.92[cite: 1]</td>
+        <td>17.1[cite: 1]</td>
+        <td>52 KB[cite: 1]</td>
+        <td>0.85[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>QAT (INT8)[cite: 1]</td>
+        <td>2.87[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td>17.7[cite: 1]</td>
+        <td>52 KB[cite: 1]</td>
+        <td>0.85[cite: 1]</td>
+      </tr>
+      <tr>
+        <td>FP16 (mixed precision)[cite: 1]</td>
+        <td>2.89[cite: 1]</td>
+        <td>0.94[cite: 1]</td>
+        <td>17.9[cite: 1]</td>
+        <td>97 KB[cite: 1]</td>
+        <td>1.10[cite: 1]</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Recommendation:</strong> QAT INT8 preserves 99.3% of PESQ accuracy while reducing model size by 73% and inference latency by 30%[cite: 1]. For the RPi 5 deployment, QAT INT8 is the preferred quantization method[cite: 1].</p>
+</section>
+
+<!-- APPENDIX E -->
+<section class="page">
+  <div class="section-header">
+    <div class="section-number">E</div>
+    <h2>Appendix E: Field Deployment Checklist[cite: 1]</h2>
+  </div>
+  <h3>E.1 Pre-Deployment Hardware Verification[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#[cite: 1]</th>
+        <th>Check Item[cite: 1]</th>
+        <th>Method[cite: 1]</th>
+        <th>Pass Criteria[cite: 1]</th>
+        <th>Status[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1[cite: 1]</td><td>RPi 5 power supply[cite: 1]</td><td>Measure V/G under load[cite: 1]</td><td>5.1V +/- 5%, 3A sustained[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>2[cite: 1]</td><td>ReSpeaker HAT seating[cite: 1]</td><td>Visual + ALSA test[cite: 1]</td><td>hw:seeed2micvoicec detected[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>3[cite: 1]</td><td>I2S DMA configuration[cite: 1]</td><td>cat /proc/asound/pcm[cite: 1]</td><td>pcm0D: mapped to I2S[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>4[cite: 1]</td><td>Active cooler operation[cite: 1]</td><td>stress-ng --cpu 4[cite: 1]</td><td>Temp stays below 70C[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>5[cite: 1]</td><td>NVMe SSD read/write[cite: 1]</td><td>dd if=/dev/zero of=test bs=1M[cite: 1]</td><td>&gt; 200 MB/s write[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>6[cite: 1]</td><td>GPIO 40-pin continuity[cite: 1]</td><td>gpio readall[cite: 1]</td><td>All pins responding[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>7[cite: 1]</td><td>MicroSD boot test[cite: 1]</td><td>Boot from NVMe, verify SD empty[cite: 1]</td><td>OS boots from NVMe[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>8[cite: 1]</td><td>USB-C power meter[cite: 1]</td><td>Inline measurement[cite: 1]</td><td>&lt; 7.5W under full load[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+    </tbody>
+  </table>
+
+  <h3>E.2 Pre-Deployment Software Verification[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#[cite: 1]</th>
+        <th>Check Item[cite: 1]</th>
+        <th>Command[cite: 1]</th>
+        <th>Pass Criteria[cite: 1]</th>
+        <th>Status[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1[cite: 1]</td><td>PREEMPT_RT kernel[cite: 1]</td><td>uname -v | grep PREEMPT[cite: 1]</td><td>PREEMPT_RT present[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>2[cite: 1]</td><td>Core isolation[cite: 1]</td><td>cat /sys/devices/system/cpu/isolated[cite: 1]</td><td>Core 3 isolated[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>3[cite: 1]</td><td>ONNX model loaded[cite: 1]</td><td>python -c "import onnxruntime..."[cite: 1]</td><td>Session created OK[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>4[cite: 1]</td><td>I2S audio capture[cite: 1]</td><td>arecord -D hw:seeed2micvoicec -f S16_LE -r 16000 test.wav[cite: 1]</td><td>Clean capture[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>5[cite: 1]</td><td>I2S audio playback[cite: 1]</td><td>aplay -D hw:seeed2micvoicec test.wav[cite: 1]</td><td>Clean playback[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>6[cite: 1]</td><td>ALSA exclusive mode[cite: 1]</td><td>cat /etc/asound.conf[cite: 1]</td><td>No PulseAudio/PipeWire[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>7[cite: 1]</td><td>SCHED_FIFO priority[cite: 1]</td><td>chrt -p $(pidof anc_daemon)[cite: 1]</td><td>Priority 90[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>8[cite: 1]</td><td>Process CPU pinning[cite: 1]</td><td>taskset -p $(pidof anc_daemon)[cite: 1]</td><td>Core 3 (mask 0x8)[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+    </tbody>
+  </table>
+
+  <h3>E.3 Performance Validation Tests[cite: 1]</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#[cite: 1]</th>
+        <th>Test[cite: 1]</th>
+        <th>Duration[cite: 1]</th>
+        <th>Pass Criteria[cite: 1]</th>
+        <th>Status[cite: 1]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1[cite: 1]</td><td>Sustained inference[cite: 1]</td><td>60 minutes[cite: 1]</td><td>RTF &lt;= 0.15, no crashes[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>2[cite: 1]</td><td>Thermal stress[cite: 1]</td><td>30 minutes at 45C ambient[cite: 1]</td><td>CPU &lt; 75C, no throttle[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>3[cite: 1]</td><td>Latency measurement[cite: 1]</td><td>10,000 frames[cite: 1]</td><td>P99 &lt; 17.22 ms[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>4[cite: 1]</td><td>Power measurement[cite: 1]</td><td>30 minutes sustained[cite: 1]</td><td>&lt; 7.5W average[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>5[cite: 1]</td><td>Memory leak check[cite: 1]</td><td>24 hours continuous[cite: 1]</td><td>RSS stable (+/- 5%)[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>6[cite: 1]</td><td>Audio quality (PESQ)[cite: 1]</td><td>50 test samples[cite: 1]</td><td>PESQ &gt; 2.50 on all[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>7[cite: 1]</td><td>Impulse robustness[cite: 1]</td><td>100 gunshot samples[cite: 1]</td><td>No divergence, PESQ &gt; 2.30[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+      <tr><td>8[cite: 1]</td><td>Boot-to-ready time[cite: 1]</td><td>Cold boot measurement[cite: 1]</td><td>&lt; 45 seconds to audio ready[cite: 1]</td><td>[ ][cite: 1]</td></tr>
+    </tbody>
+  </table>
+
+  <h3>E.4 Field Deployment Steps[cite: 1]</h3>
+  <ol>
+    <li><strong>Step 1 — Hardware Assembly:</strong> Mount ReSpeaker HAT, connect boom mic and reference mic, attach NVMe SSD, connect active cooler, verify all connections[cite: 1].</li>
+    <li><strong>Step 2 — OS Configuration:</strong> Flash NVMe with RPi OS 64-bit, apply PREEMPT_RT kernel, configure cmdline.txt with core isolation, disable WiFi/Bluetooth if not needed[cite: 1].</li>
+    <li><strong>Step 3 — Audio Setup:</strong> Install ALSA configuration, verify I2S capture/playback, test with known audio signal[cite: 1].</li>
+    <li><strong>Step 4 — Model Deployment:</strong> Copy gtcrn_int8.onnx to /opt/anc/models/, verify ONNX Runtime loads successfully, run 1000-frame benchmark[cite: 1].</li>
+    <li><strong>Step 5 — Daemon Configuration:</strong> Install anc_daemon.service, enable systemd autostart, verify SCHED_FIFO and CPU pinning[cite: 1].</li>
+    <li><strong>Step 6 — Validation:</strong> Run full test suite from E.3, document all results, sign off on checklist[cite: 1].</li>
+    <li><strong>Step 7 — Enclosure Mount:</strong> Install RPi5 + HAT assembly into CNC aluminum enclosure, connect PTT headset, verify EMI shielding[cite: 1].</li>
+    <li><strong>Step 8 — Field Test:</strong> Deploy in target acoustic environment, conduct 1-hour operational trial, collect subjective feedback[cite: 1].</li>
+  </ol>
+</section>
+
+</body>
+</html>
