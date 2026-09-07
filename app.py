@@ -1,10 +1,14 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
 import os
 import sys
 
 # Prevent OpenMP runtime collision crashes on Windows
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-# Force headless Matplotlib backend
+# Force headless Matplotlib backend before importing pyplot
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -21,6 +25,7 @@ from gtcrn import GTCRN
 TARGET_SR = 16000
 N_FFT = 512
 HOP_LEN = 128
+SCENARIO_DIR = "data/scenarios"
 
 st.set_page_config(
     page_title="DRDO Tactical Edge ANC - SIH26052",
@@ -52,7 +57,6 @@ def enhance_audio_stream(audio_np, voice_gain=1.2, voice_floor=0.08):
         audio_np = np.mean(audio_np, axis=1)
     audio_np = audio_np.astype(np.float32)
 
-    # 1. Pre-STFT Peak Limiter
     limited_audio = acoustic_blast_limiter(audio_np, threshold=0.95)
 
     tensor_in = torch.from_numpy(limited_audio).unsqueeze(0).to(device)
@@ -63,7 +67,7 @@ def enhance_audio_stream(audio_np, voice_gain=1.2, voice_floor=0.08):
         stft = torch.stft(tensor_in, n_fft=N_FFT, hop_length=HOP_LEN, window=window, return_complex=True)
         r_out, i_out = model(stft.real, stft.imag)
 
-        # Subtle voice formant reinforcement (300 Hz - 3.4 kHz)
+        # Voice formant reinforcement (300 Hz - 3.4 kHz)
         r_out[:, 10:110, :] *= voice_gain
         i_out[:, 10:110, :] *= voice_gain
 
@@ -75,34 +79,31 @@ def enhance_audio_stream(audio_np, voice_gain=1.2, voice_floor=0.08):
     elapsed_ms = (time.perf_counter() - t0) * 1000
 
     cleaned = enhanced.squeeze().cpu().numpy()
-
-    # Continuous soft noise floor to avoid musical artifacts
-    final_audio = (1.0 - voice_floor) * cleaned + (voice_floor * 0.12) * limited_audio
+    final_audio = (1.0 - voice_floor) * cleaned + (voice_floor * 0.10) * limited_audio
     final_audio = np.clip(final_audio, -0.98, 0.98)
 
     num_frames = max(1, (len(audio_np) - N_FFT) // HOP_LEN + 1)
     frame_ms = elapsed_ms / num_frames
     return final_audio, frame_ms, elapsed_ms
 
-def render_tactical_spectrograms(noisy, clean):
-    """Generates 3 synchronized spectrograms: Input, Enhanced Output, and Stripped Noise."""
+def render_tactical_spectrograms(noisy, clean, scenario_title):
     fig, axes = plt.subplots(1, 3, figsize=(15, 3.2), sharey=True)
 
     # 1. Noisy Spectrum
     axes[0].specgram(noisy, Fs=TARGET_SR, NFFT=256, noverlap=128, cmap="inferno")
-    axes[0].set_title("1. Input: Battlefield Raw (Speech + Noise)", fontsize=10, fontweight="bold")
+    axes[0].set_title(f"Input: {scenario_title}", fontsize=9, fontweight="bold")
     axes[0].set_xlabel("Time (s)", fontsize=8)
     axes[0].set_ylabel("Frequency (Hz)", fontsize=8)
 
     # 2. Cleaned Spectrum
     axes[1].specgram(clean, Fs=TARGET_SR, NFFT=256, noverlap=128, cmap="viridis")
-    axes[1].set_title("2. Output: AI Tactical Enhanced (Speech Preserved)", fontsize=10, fontweight="bold")
+    axes[1].set_title("Output: AI Tactical Enhanced (Vocal Formants)", fontsize=9, fontweight="bold")
     axes[1].set_xlabel("Time (s)", fontsize=8)
 
-    # 3. Residual Difference (Noise Removed)
+    # 3. Residual Noise Stripped
     diff = np.abs(noisy - clean)
     axes[2].specgram(diff, Fs=TARGET_SR, NFFT=256, noverlap=128, cmap="magma")
-    axes[2].set_title("3. Differential: Suppressed Combat Noise Floor", fontsize=10, fontweight="bold")
+    axes[2].set_title("Residual: Stripped Combat Noise Profile", fontsize=9, fontweight="bold")
     axes[2].set_xlabel("Time (s)", fontsize=8)
 
     for ax in axes:
@@ -110,7 +111,7 @@ def render_tactical_spectrograms(noisy, clean):
     fig.tight_layout()
     return fig
 
-# --- UI HEADER & TELEMETRY HUD ---
+# --- UI HEADER & TELEMETRY ---
 st.title("DRDO Tactical AI Noise Cancellation System")
 dev_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
 st.caption(f"SIH26052 | Hybrid Complex-Domain Neural Speech Extraction on {dev_name}")
@@ -124,7 +125,7 @@ m5.metric("Model Footprint", "592 KB (INT8)", delta="L3 Cache Resident")
 
 tabs = st.tabs(["Tactical Combat Scenarios", "Live Microphone Denoising"])
 
-# TAB 1: PRESET SCENARIOS
+# --- TAB 1: PRESET SCENARIOS ---
 with tabs[0]:
     st.markdown("### Operational Combat Scenarios")
 
@@ -135,52 +136,57 @@ with tabs[0]:
         scenario = st.selectbox(
             "Select Combat Environment",
             [
-                "Custom Manifest Sample",
                 "T-90 Bhishma Tank (Continuous Low Rumble)",
                 "ALH Dhruv Helicopter (Periodic Rotor Blade Chop)",
                 "Artillery & Heavy Gunfire (Transient Shockwaves)"
             ]
         )
 
-        v_boost = st.slider("Speech Formant Boost", 1.0, 2.0, 1.2, 0.05)
+        v_boost = st.slider("Speech Formant Boost", 1.0, 2.0, 1.25, 0.05)
         v_floor = st.slider("Harmonic Retention Floor", 0.02, 0.20, 0.08, 0.01)
         engage_btn = st.button("Engage Tactical ANC", type="primary", key="btn_scenario")
 
-    with col_display:
-        manifest_path = "./data/train_set/manifest.csv"
-        sample_noisy = None
-        if os.path.exists(manifest_path):
-            import pandas as pd
-            df = pd.read_csv(manifest_path)
-            sample_noisy = df.iloc[0]["noisy_path"]
+    scenario_files = {
+        "T-90 Bhishma Tank (Continuous Low Rumble)": ("tank_noisy.wav", "tank_clean.wav", "T-90 Tank (Low Drone)"),
+        "ALH Dhruv Helicopter (Periodic Rotor Blade Chop)": ("heli_noisy.wav", "heli_clean.wav", "ALH Dhruv (Rotor Chop)"),
+        "Artillery & Heavy Gunfire (Transient Shockwaves)": ("artillery_noisy.wav", "artillery_clean.wav", "Artillery (Impulsive)")
+    }
 
-        if sample_noisy and os.path.exists(sample_noisy):
-            raw_audio, sr = sf.read(sample_noisy, dtype="float32")
+    noisy_fname, clean_fname, title_tag = scenario_files[scenario]
+    noisy_path = os.path.join(SCENARIO_DIR, noisy_fname)
+
+    with col_display:
+        if os.path.exists(noisy_path):
+            raw_audio, sr = sf.read(noisy_path, dtype="float32")
 
             if engage_btn:
                 clean_audio, frame_ms, total_ms = enhance_audio_stream(raw_audio, v_boost, v_floor)
 
                 os.makedirs("results", exist_ok=True)
-                sf.write("results/demo_noisy.wav", raw_audio, TARGET_SR)
-                sf.write("results/demo_cleaned.wav", clean_audio, TARGET_SR)
+                out_noisy_path = f"results/{noisy_fname}"
+                out_clean_path = f"results/enhanced_{noisy_fname}"
+                sf.write(out_noisy_path, raw_audio, TARGET_SR)
+                sf.write(out_clean_path, clean_audio, TARGET_SR)
 
                 st.success(f"Execution Complete: {total_ms:.1f} ms total ({frame_ms:.3f} ms / 8ms frame)")
 
-                # Audio comparison
+                # Audio Playback
                 a1, a2 = st.columns(2)
                 with a1:
-                    st.markdown("**Battlefield Channel (Raw)**")
-                    st.audio("results/demo_noisy.wav")
+                    st.markdown(f"**Original Battlefield Audio ({title_tag})**")
+                    st.audio(out_noisy_path)
                 with a2:
-                    st.markdown("**Tactical Enhanced Stream**")
-                    st.audio("results/demo_cleaned.wav")
+                    st.markdown(f"**Tactical Enhanced Speech Stream**")
+                    st.audio(out_clean_path)
 
-                # Spectrogram 3-way analysis
-                st.pyplot(render_tactical_spectrograms(raw_audio, clean_audio))
+                # 3-Way Spectrogram Analysis
+                st.pyplot(render_tactical_spectrograms(raw_audio, clean_audio, title_tag))
             else:
-                st.info("Select scenario parameters and click 'Engage Tactical ANC' to process.")
+                st.info(f"Selected: **{title_tag}**. Click 'Engage Tactical ANC' to process.")
+        else:
+            st.warning("Scenario files not detected. Run `python build_scenarios.py` in your terminal to generate them.")
 
-# TAB 2: LIVE BROWSER MICROPHONE
+# --- TAB 2: LIVE BROWSER MICROPHONE ---
 with tabs[1]:
     st.markdown("### Real-Time Mic Capture via Browser")
 
@@ -225,6 +231,6 @@ with tabs[1]:
                 st.markdown("**Enhanced Output**")
                 st.audio("results/mic_enhanced.wav")
 
-            st.pyplot(render_tactical_spectrograms(data, cleaned_mic))
+            st.pyplot(render_tactical_spectrograms(data, cleaned_mic, "Live Microphone"))
         else:
             st.info("Record a short voice sample using the microphone widget to test noise cancellation.")
