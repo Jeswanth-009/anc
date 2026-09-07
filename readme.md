@@ -117,7 +117,7 @@ graph TD
     
     H --> I[Inverse STFT Synthesis<br/>Overlap-Add OLA]
     I --> J[Zero-Phase Soft Retention Floor<br/>Vocal Formant Protection]
-    J --> K[Tactical Enhanced Audio Stream<br/>Latency: 0.037ms | SI-SDR: +7.71 dB]
+    J --> K[Tactical Enhanced Audio Stream<br/>Latency: 0.037ms / SI-SDR: +7.71 dB]
 
     style A fill:#e74c3c,stroke:#c0392b,color:#fff
     style F fill:#2980b9,stroke:#1f618d,color:#fff
